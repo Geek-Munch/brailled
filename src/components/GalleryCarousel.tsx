@@ -101,6 +101,7 @@ export function GalleryCarousel() {
                 loading={index === currentIndex ? "eager" : "lazy"}
                 decoding="async"
               />
+      
             </div>
           ))}
         </div>

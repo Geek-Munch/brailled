@@ -66,13 +66,14 @@ body {
   outline-offset: 2px;
 }
 
-a {
+p a {
   color: var(--brand-dark);
   text-decoration: none;
 }
 
-a:hover {
+ a:hover {
   text-decoration: underline;
+  
 }
 
 .landing-header {

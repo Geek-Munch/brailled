@@ -1,5 +1,5 @@
 import "../styles/app.css";
-import "@phosphor-icons/web/regular";
+import "@phosphor-icons/web/css/regular.css";
 import { initA11yFromStorage } from "../lib/a11y-preferences";
 import { mountPlayground } from "../components/playground";
 

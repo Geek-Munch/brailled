@@ -52,7 +52,7 @@ export function EvidencePage() {
       setCountyCount(uniqueCounties.size);
       const sumAges = records.reduce((sum: number, r: any) => sum + (r.age || 0), 0);
       setTotalAgeSum(sumAges);
-      const uniqueSessions = new Set(records.map((r: any) => r.sessionType));
+      const uniqueSessions = new Set<string>(records.map((r: any) => r.sessionType));
       setSessionTypes(Array.from(uniqueSessions));
     }
   }, []);
@@ -158,7 +158,7 @@ export function EvidencePage() {
             </a>
             
             <div className="flex items-center gap-3 xl:gap-4 ml-2 xl:ml-4">
-              <a href={MAIL_DEMO} className={`text-xs font-bold uppercase tracking-widest px-4 xl:px-6 py-2 xl:py-2.5 border-2 transition
+              <a href={MAIL_DEMO} target='_blank' className={`text-xs font-bold uppercase tracking-widest px-4 xl:px-6 py-2 xl:py-2.5 border-2 transition
                 ${scrolled
                   ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
                   : 'border-white text-white hover:bg-white hover:text-slate-900'}`}>
@@ -363,27 +363,16 @@ export function EvidencePage() {
           <EvidenceTable isAdminView={false} />
 
           <div className="mt-8 text-center space-y-2">
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>
               Data represents anonymized learner interactions from BrailleBot programs across Kenya
             </p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs italic" style={{ color: 'var(--text-muted)' }}>
               All personally identifiable information has been removed to protect learner privacy
             </p>
           </div>
         </div>
       </section>
-
-      {/* BUNIFU STRIP */}
-      <section className="py-16" style={{ backgroundColor: ELECTRIC_BLUE }}>
-        <div className="max-w-4xl mx-auto text-center px-6">
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">
-            A product of Bunifu Youths Kenya
-          </h2>
-          <p className="text-lg text-white/80 max-w-2xl mx-auto">
-            Empowering young people through inclusive technology and education across the region.
-          </p>
-        </div>
-      </section>
+ 
 
       {/* FOOTER */}
       <footer className="bg-black text-white py-24 px-6 lg:px-24">
@@ -406,7 +395,7 @@ export function EvidencePage() {
           <div>
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-blue-500 mb-8">Contact</h3>
             <ul className="space-y-4 text-sm text-gray-300">
-              <li><a href={MAIL_KIT} className="hover:text-white transition">bunifuyouthskenya@gmail.com</a></li>
+              <li><a href={MAIL_KIT} className="hover:text-white transition">braillededucation@gmail.com</a></li>
               <li><a href="tel:+254712015793" className="hover:text-white transition">0712 015793</a></li>
               <li className="pt-4 font-bold text-white uppercase tracking-widest text-xs">Based in Kenya</li>
             </ul>
@@ -414,7 +403,7 @@ export function EvidencePage() {
         </div>
         <div className="max-w-7xl mx-auto border-t border-white/10 mt-20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-gray-500 text-xs uppercase tracking-widest">
-            © {year} BrailleEd · Bunifu Youths Kenya
+            © {year} BrailleEducation 
           </p>
           <div className="flex gap-8 text-gray-500 text-xs uppercase tracking-widest">
             <span>Accessibility First</span>
