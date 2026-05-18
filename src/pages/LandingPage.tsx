@@ -6,7 +6,7 @@ import { MAIL_CONTACT, MAIL_DEMO, MAIL_KIT, MAIL_PLAIN } from "../lib/landing-ma
 import { Play, Calendar, Menu, X } from "lucide-react";
 import { animate, useInView } from "framer-motion";
 
-// TeamCard — hover controlled via JS refs to bypass any CSS transition overrides from app.css
+// TeamCards hover 
 function TeamCard({ member }: { member: { src: string; name: string; role: string } }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   return (
@@ -33,7 +33,7 @@ function TeamCard({ member }: { member: { src: string; name: string; role: strin
         <p className="text-white font-black text-base uppercase tracking-tight leading-snug">{member.name}</p>
       </div>
 
-      {/* Hover overlay — opacity driven by JS so CSS transition overrides don't matter */}
+      {/* Hover overlay,opacity driven by JS  */}
       <div
         ref={overlayRef}
         className="absolute inset-0 flex flex-col justify-end px-5 pb-5 bg-gradient-to-t from-blue-700/90 via-blue-600/40 to-transparent pointer-events-none"
@@ -73,10 +73,7 @@ const KIT_PHOTOS: readonly { src: string; alt: string }[] = [
 ];
 
 /*
-  ─────────────────────────────────────────────────────────────────
-  TEAM MEMBERS — swap src, name, and role for each person.
-  Photos: replace each src with your own image paths.
-  ─────────────────────────────────────────────────────────────────
+  TEAM MEMBERS 
 */
 const TEAM_MEMBERS = [
   { src: "maxwell.jpeg",  name: "Maxwell Kamau",    role: "Founder & CEO"                    },
@@ -374,11 +371,11 @@ export function LandingPage() {
                 We design accessible kits and lesson materials that work for learners who cannot use standard screens or printed resources, ensuring no student is left behind in the digital revolution.
               </p>
             </div>
-            {/* TO CHANGE THIS IMAGE: replace "who we are.jpeg" with your own image path */}
+            {/* who we are image */}
             <div className="lg:w-[45%] overflow-hidden rounded-sm shadow-2xl">
               <img
                 src="who we are.jpeg"
-                alt="BrailleEd student working with robotics kit"
+                alt="who we are image"
                 className="w-full h-[420px] xl:h-[520px] object-cover"
               />
             </div>
