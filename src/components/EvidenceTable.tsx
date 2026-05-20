@@ -92,7 +92,7 @@ export function EvidenceTable({ isAdminView = false }: EvidenceTableProps) {
         )}
       </div>
 
-      {/* Expandable Filters Panel */}
+      {/*  Filters Panel */}
       {showFilters && (
         <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: 'var(--brand-soft)', border: `1px solid ${ELECTRIC_BLUE_GLOW}` }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
