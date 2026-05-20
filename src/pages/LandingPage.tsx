@@ -78,11 +78,11 @@ const KIT_PHOTOS: readonly { src: string; alt: string }[] = [
 const TEAM_MEMBERS = [
   { src: "maxwell.jpeg",  name: "Maxwell Kamau",    role: "Founder & CEO"                    },
   { src: "patricia.jpeg", name: "Patricia Wanjiru", role: "Co-founder"                        },
-  { src: "ann.jpeg",      name: "Ann Nyokabi",      role: "Software Engineer & Web Developer" },
+  { src: "ann.jpeg",      name: "Ann Nyokabi",      role: "Co-founder" },
   { src: "johndoe2.jpeg", name: "John Doe2",        role: "Lead Engineer"                     },
   { src: "mokaya.jpeg",   name: "Brian Mokaya",     role: "Software Developer"                },
   { src: "Mungai.jpeg",   name: "Ruth Mungai",      role: "Software Developer"                },
-  { src: "/team-8.jpg",   name: "Erick Mutua",      role: "Backend Developer"                 },
+  { src: "erick.JPG",   name: "Erick Mutua",      role: "Backend Developer"                 },
   { src: "victor.jpeg",   name: "Victor Munene",    role: "Web & Software Developer"          },
   { src: "isaiah.jpeg",   name: "Isaiah Wambani",   role: "Frontend Developer"                },
 ];
