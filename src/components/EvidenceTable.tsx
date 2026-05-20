@@ -12,8 +12,8 @@ const SESSION_TYPES: SessionType[] = ["Prototype assembly session", "Voice codin
 
 const ITEMS_PER_PAGE = 10;
 
-export function EvidenceTable({ isAdminView = false }: EvidenceTableProps) {
-  const { evidence, deleteEvidence } = useAdmin();
+export function EvidenceTable({ isAdminView = false, records }: EvidenceTableProps) {
+  const { evidence } = useAdmin();
   const [filters, setFilters] = useState<EvidenceFilters>({
     school: '',
     county: '',
@@ -24,8 +24,10 @@ export function EvidenceTable({ isAdminView = false }: EvidenceTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
+  const dataSource = useMemo(() => (records ?? evidence), [records, evidence]);
+
   const filteredEvidence = useMemo(() => {
-    return evidence.filter(record => {
+    return dataSource.filter(record => {
       const matchesSchool = filters.school === '' || record.school.toLowerCase().includes(filters.school.toLowerCase());
       const matchesCounty = filters.county === '' || record.county === filters.county;
       const matchesDisability = filters.disabilityType === '' || record.disabilityType === filters.disabilityType;
@@ -36,7 +38,7 @@ export function EvidenceTable({ isAdminView = false }: EvidenceTableProps) {
       
       return matchesSchool && matchesCounty && matchesDisability && matchesSession && matchesSearch;
     });
-  }, [evidence, filters, searchTerm]);
+  }, [dataSource, filters, searchTerm]);
 
   const totalPages = Math.ceil(filteredEvidence.length / ITEMS_PER_PAGE);
   const paginatedEvidence = filteredEvidence.slice(
@@ -162,6 +164,13 @@ export function EvidenceTable({ isAdminView = false }: EvidenceTableProps) {
                 <td className="px-4 py-3 text-slate-500 italic max-w-md">{record.outcomeRecorded}</td>
               </tr>
             ))}
+            {paginatedEvidence.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                  No evidence records match your filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -201,4 +210,5 @@ export function EvidenceTable({ isAdminView = false }: EvidenceTableProps) {
 
 interface EvidenceTableProps {
   isAdminView?: boolean;
+  records?: LearnerEvidence[];
 }
