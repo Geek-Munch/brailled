@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { EvidenceTable } from '../components/EvidenceTable';
 import { MAIL_DEMO, MAIL_KIT } from "../lib/landing-mailto";
 import { Play, Calendar, Users, MapPin, TrendingUp, Award, Menu, X } from 'lucide-react';
 import { animate, useInView } from 'framer-motion';
+import { fetchAllPages } from '../lib/api-client';
+import { mapEvidenceFromApi } from '../lib/evidence';
+import { LearnerEvidence } from '../types/evidence';
 
 const LOGO = "/Braille%20bot%20%20Bio.png";
 
@@ -32,10 +35,9 @@ function CountingNumber({ value }: { value: number }) {
 
 export function EvidencePage() {
   const year = new Date().getFullYear();
-  const [recordCount, setRecordCount] = useState(0);
-  const [countyCount, setCountyCount] = useState(0);
-  const [totalAgeSum, setTotalAgeSum] = useState(0);
-  const [sessionTypes, setSessionTypes] = useState<string[]>([]);
+  const [evidence, setEvidence] = useState<LearnerEvidence[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [scrolled, setScrolled] = useState(false);
@@ -44,17 +46,28 @@ export function EvidencePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('brailleEvidences');
-    if (saved) {
-      const records = JSON.parse(saved);
-      setRecordCount(records.length);
-      const uniqueCounties = new Set(records.map((r: any) => r.county));
-      setCountyCount(uniqueCounties.size);
-      const sumAges = records.reduce((sum: number, r: any) => sum + (r.age || 0), 0);
-      setTotalAgeSum(sumAges);
-      const uniqueSessions = new Set<string>(records.map((r: any) => r.sessionType));
-      setSessionTypes(Array.from(uniqueSessions));
-    }
+    let isMounted = true;
+    setIsLoading(true);
+    setError(null);
+
+    fetchAllPages<any>("/resources/user-evidence/")
+      .then((records) => {
+        if (!isMounted) return;
+        setEvidence(records.map(mapEvidenceFromApi));
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        const message = err instanceof Error ? err.message : "Failed to load evidence.";
+        setError(message);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Close mobile menu when resizing to desktop
@@ -119,7 +132,21 @@ export function EvidencePage() {
     }
   }, []);
 
-  const averageAge = recordCount > 0 ? Math.round(totalAgeSum / recordCount) : 0;
+  const stats = useMemo(() => {
+    const recordCount = evidence.length;
+    const countyCount = new Set(evidence.map((record) => record.county)).size;
+    const totalAge = evidence.reduce((sum, record) => sum + (record.age || 0), 0);
+    const sessionTypes = new Set(evidence.map((record) => record.sessionType));
+    const averageAge = recordCount > 0 ? Math.round(totalAge / recordCount) : 0;
+    return {
+      recordCount,
+      countyCount,
+      averageAge,
+      sessionTypes: Array.from(sessionTypes),
+    };
+  }, [evidence]);
+
+  const averageAge = stats.averageAge;
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
@@ -255,13 +282,13 @@ export function EvidencePage() {
             <div className="grid grid-cols-2 gap-4 min-w-[300px]">
               <div className="backdrop-blur-md rounded-xl p-6 text-center border border-white/20" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
                 <div className="text-4xl font-black text-white">
-                  <CountingNumber value={recordCount} />
+                  <CountingNumber value={stats.recordCount} />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-wider mt-1 text-white/80">Total Records</p>
               </div>
               <div className="backdrop-blur-md rounded-xl p-6 text-center border border-white/20" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
                 <div className="text-4xl font-black text-white">
-                  <CountingNumber value={countyCount} />
+                  <CountingNumber value={stats.countyCount} />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-wider mt-1 text-white/80">Counties Reached</p>
               </div>
@@ -273,7 +300,7 @@ export function EvidencePage() {
               </div>
               <div className="backdrop-blur-md rounded-xl p-6 text-center border border-white/20" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
                 <div className="text-4xl font-black text-white">
-                  <CountingNumber value={sessionTypes.length} />
+                  <CountingNumber value={stats.sessionTypes.length} />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-wider mt-1 text-white/80">Session Types</p>
               </div>
@@ -294,7 +321,7 @@ export function EvidencePage() {
                 </div>
               </div>
               <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
-                <CountingNumber value={recordCount} />
+                <CountingNumber value={stats.recordCount} />
               </div>
               <div className="impact-label text-sm">learners engaged</div>
             </div>
@@ -306,7 +333,7 @@ export function EvidencePage() {
                 </div>
               </div>
               <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
-                <CountingNumber value={countyCount} />
+                <CountingNumber value={stats.countyCount} />
               </div>
               <div className="impact-label text-sm">counties across Kenya</div>
             </div>
@@ -330,7 +357,7 @@ export function EvidencePage() {
                 </div>
               </div>
               <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
-                <CountingNumber value={sessionTypes.length} />
+                <CountingNumber value={stats.sessionTypes.length} />
               </div>
               <div className="impact-label text-sm">different session types</div>
             </div>
@@ -360,7 +387,19 @@ export function EvidencePage() {
             </li>
           </div>
 
-          <EvidenceTable isAdminView={false} />
+          {error && (
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="mb-6 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm" style={{ color: 'var(--text-muted)' }}>
+              Loading evidence records...
+            </div>
+          )}
+
+          <EvidenceTable isAdminView={false} records={evidence} />
 
           <div className="mt-8 text-center space-y-2">
             <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>

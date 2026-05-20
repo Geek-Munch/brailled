@@ -7,8 +7,8 @@ export interface LearnerEvidence {
   disabilityType: string;
   sessionType: string;
   outcomeRecorded: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type DisabilityType = 

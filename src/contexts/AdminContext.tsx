@@ -1,89 +1,99 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LearnerEvidence } from '../types/evidence';
-import { SAMPLE_EVIDENCE } from '../data/sample-evidence';
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { apiRequest, fetchAllPages } from "../lib/api-client";
+import { mapEvidenceFromApi, mapEvidenceToApi, EvidenceInput } from "../lib/evidence";
+import { LearnerEvidence } from "../types/evidence";
 
 interface AdminContextType {
-  isAdmin: boolean;
-  loginAsAdmin: (password: string) => boolean;
-  logout: () => void;
   evidence: LearnerEvidence[];
-  addEvidence: (record: Omit<LearnerEvidence, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  editEvidence: (id: string, updates: Partial<LearnerEvidence>) => void;
-  deleteEvidence: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  refreshEvidence: (options?: { auth?: boolean }) => Promise<void>;
+  addEvidence: (record: EvidenceInput) => Promise<LearnerEvidence>;
+  editEvidence: (id: string, updates: Partial<LearnerEvidence>) => Promise<LearnerEvidence>;
+  deleteEvidence: (id: string) => Promise<void>;
+  clearError: () => void;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
-const ADMIN_PASSWORD = 'BrailleEd2025';
+const EVIDENCE_ENDPOINT = "/resources/user-evidence/";
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [evidence, setEvidence] = useState<LearnerEvidence[]>(() => {
-    const saved = localStorage.getItem('brailleEvidences');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.map((e: any) => ({ 
-        ...e, 
-        createdAt: new Date(e.createdAt), 
-        updatedAt: new Date(e.updatedAt) 
-      }));
+  const [evidence, setEvidence] = useState<LearnerEvidence[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const clearError = useCallback(() => setError(null), []);
+
+  const refreshEvidence = useCallback(async (options: { auth?: boolean } = {}) => {
+    setIsLoading(true);
+    try {
+      const records = await fetchAllPages<any>(EVIDENCE_ENDPOINT, { auth: options.auth });
+      setEvidence(records.map(mapEvidenceFromApi));
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load evidence.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
     }
-    return SAMPLE_EVIDENCE;
-  });
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('brailleEvidences', JSON.stringify(evidence));
-  }, [evidence]);
+  const addEvidence = useCallback(async (record: EvidenceInput) => {
+    const payload = await apiRequest<any>(EVIDENCE_ENDPOINT, {
+      method: "POST",
+      auth: true,
+      body: mapEvidenceToApi(record),
+    });
+    const created = mapEvidenceFromApi(payload);
+    setEvidence((prev) => [created, ...prev]);
+    return created;
+  }, []);
 
-  const loginAsAdmin = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      return true;
-    }
-    return false;
-  };
+  const editEvidence = useCallback(async (id: string, updates: Partial<LearnerEvidence>) => {
+    const payload = await apiRequest<any>(`${EVIDENCE_ENDPOINT}${id}/`, {
+      method: "PATCH",
+      auth: true,
+      body: mapEvidenceToApi(updates),
+    });
+    const updated = mapEvidenceFromApi(payload);
+    setEvidence((prev) => prev.map((record) => (record.id === id ? updated : record)));
+    return updated;
+  }, []);
 
-  const logout = () => setIsAdmin(false);
+  const deleteEvidence = useCallback(async (id: string) => {
+    await apiRequest(`${EVIDENCE_ENDPOINT}${id}/`, { method: "DELETE", auth: true });
+    setEvidence((prev) => prev.filter((record) => record.id !== id));
+  }, []);
 
-  const addEvidence = (record: Omit<LearnerEvidence, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newRecord: LearnerEvidence = {
-      ...record,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setEvidence(prev => [newRecord, ...prev]);
-  };
-
-  const editEvidence = (id: string, updates: Partial<LearnerEvidence>) => {
-    setEvidence(prev => prev.map(record => 
-      record.id === id 
-        ? { ...record, ...updates, updatedAt: new Date() }
-        : record
-    ));
-  };
-
-  const deleteEvidence = (id: string) => {
-    setEvidence(prev => prev.filter(record => record.id !== id));
-  };
-
-  return (
-    <AdminContext.Provider value={{ 
-      isAdmin, 
-      loginAsAdmin, 
-      logout, 
-      evidence, 
-      addEvidence, 
-      editEvidence, 
-      deleteEvidence 
-    }}>
-      {children}
-    </AdminContext.Provider>
+  const value = useMemo(
+    () => ({
+      evidence,
+      isLoading,
+      error,
+      refreshEvidence,
+      addEvidence,
+      editEvidence,
+      deleteEvidence,
+      clearError,
+    }),
+    [
+      evidence,
+      isLoading,
+      error,
+      refreshEvidence,
+      addEvidence,
+      editEvidence,
+      deleteEvidence,
+      clearError,
+    ]
   );
+
+  return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
 }
 
 export function useAdmin() {
   const context = useContext(AdminContext);
-  if (!context) throw new Error('useAdmin must be used within AdminProvider');
+  if (!context) throw new Error("useAdmin must be used within AdminProvider");
   return context;
 }
