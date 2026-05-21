@@ -9,16 +9,18 @@ import { EducatorDashboard } from './pages/EducatorDashboard';
 
 function App() {
   return (
-    <AdminProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/evidence" element={<EvidencePage />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/educator" element={<EducatorDashboard/>} />
-        </Routes>
-      </BrowserRouter>
-    </AdminProvider>
+    <AuthProvider>
+      <AdminProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/evidence" element={<EvidencePage />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/educator" element={<EducatorDashboard/>} />
+          </Routes>
+        </BrowserRouter>
+      </AdminProvider>
+    </AuthProvider>
   );
 }
 
