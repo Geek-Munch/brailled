@@ -182,6 +182,18 @@ export function LandingPage() {
     return () => window.removeEventListener("keydown", handleAdminShortcut);
   }, []);
 
+  // Educator dashboard shortcut: Ctrl+Shift+E / Cmd+Shift+E
+useEffect(() => {
+  const handleEducatorShortcut = (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "E") {
+      e.preventDefault();
+      window.location.href = "/educator";
+    }
+  };
+  window.addEventListener("keydown", handleEducatorShortcut);
+  return () => window.removeEventListener("keydown", handleEducatorShortcut);
+}, []);
+
   // Secret admin access: triple-tap logo (mobile)
   useEffect(() => {
     let tapCount = 0;
