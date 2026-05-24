@@ -1,261 +1,334 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from "react";
+import { apiRequest, fetchAllPages } from "../lib/api-client";
+import { useAuth } from "../contexts/AuthContext";
 
-// Types
-interface Student {
-  id: string;
+type StudentProfile = {
+  id: number;
   username: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  school: number;
   age: number;
-  disabilityType: string;
-  school: string;
-  department: string;
-}
+  disability_type: string;
+};
 
-interface Assignment {
-  id: string;
+type DashboardCourse = {
+  course: {
+    id: number;
+    title: string;
+    description: string;
+    thumbnail?: string | null;
+    is_published: boolean;
+  };
+  progress_percent: number;
+  completed_at: string | null;
+};
+
+type DashboardSession = {
+  id: number;
   title: string;
-  course: string;
-  dueDate: string;
-  status: 'pending' | 'submitted' | 'graded';
-  grade?: number;
-}
+  start_at: string;
+  end_at: string;
+  location: string;
+};
 
-interface Course {
-  id: string;
-  name: string;
-  instructor: string;
-  progress: number;
-  nextSession: string;
-}
-
-interface Session {
-  id: string;
-  courseName: string;
-  date: string;
-  time: string;
-  duration: string;
-  attended: boolean;
-}
-
-const StudentDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('Student Overview');
-  
-  // Mock student data
-  const student: Student = {
-    id: 'STU001',
-    username: 'john_doe',
-    email: 'john.doe@brailleed.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    age: 16,
-    disabilityType: 'Visual Impairment',
-    school: 'Nairobi School',
-    department: 'Computer Science',
+type DashboardSubmission = {
+  id: number;
+  status: string;
+  grade: string;
+  submitted_at: string;
+  assignment: {
+    id: number;
+    title: string;
+    description: string;
+    due_at: string | null;
+    course: {
+      id: number;
+      title: string;
+      description: string;
+      thumbnail?: string | null;
+      is_published: boolean;
+    };
   };
+};
 
-  // Mock courses
-  const courses: Course[] = [
-    { id: '1', name: 'Robotics Fundamentals', instructor: 'Dr. Sarah', progress: 75, nextSession: '2025-01-20' },
-    { id: '2', name: 'Braille Literacy', instructor: 'Mr. Otieno', progress: 60, nextSession: '2025-01-22' },
-    { id: '3', name: 'Assistive Technology', instructor: 'Ms. Wangari', progress: 90, nextSession: '2025-01-19' },
-  ];
+type DashboardStats = {
+  points_total: number;
+  current_streak: number;
+  longest_streak: number;
+  last_activity_at: string | null;
+};
 
-  // Mock assignments
-  const assignments: Assignment[] = [
-    { id: '1', title: 'Robot Assembly Project', course: 'Robotics Fundamentals', dueDate: '2025-01-25', status: 'pending' },
-    { id: '2', title: 'Braille Translation Exercise', course: 'Braille Literacy', dueDate: '2025-01-23', status: 'submitted', grade: 85 },
-    { id: '3', title: 'Assistive Tech Review', course: 'Assistive Technology', dueDate: '2025-01-18', status: 'graded', grade: 92 },
-  ];
+type Tab = "overview" | "courses" | "assignments" | "sessions" | "profile";
 
-  // Mock sessions
-  const sessions: Session[] = [
-    { id: '1', courseName: 'Robotics Fundamentals', date: '2025-01-15', time: '10:00 AM', duration: '2 hours', attended: true },
-    { id: '2', courseName: 'Braille Literacy', date: '2025-01-16', time: '11:30 AM', duration: '1.5 hours', attended: true },
-    { id: '3', courseName: 'Assistive Technology', date: '2025-01-17', time: '09:00 AM', duration: '2 hours', attended: false },
-  ];
+const BRAND = "#0088ce";
 
-  // Statistics
-  const statistics = {
-    totalCourses: 5,
-    completedAssignments: 12,
-    averageGrade: 87,
-    attendanceRate: 92,
-    totalSessions: 24,
-    attendedSessions: 22,
-  };
+const card = "bg-white border border-slate-200 rounded-2xl shadow-sm";
 
-  const tabs = ['Student Overview', 'My Courses', 'Students', 'Assignments', 'Sessions', 'Analytics', 'Settings'];
-  const currentTime = new Date().toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+function Stat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className={`${card} p-4`}>
+      <p className="text-xs uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="text-2xl font-black mt-1" style={{ color: BRAND }}>{value}</p>
+    </div>
+  );
+}
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'Student Overview':
-        return (
-          <div className="space-y-6">
-            {/* Profile Section */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Student Profile</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><span className="font-medium text-gray-600">Name:</span> {student.firstName} {student.lastName}</div>
-                <div><span className="font-medium text-gray-600">Username:</span> {student.username}</div>
-                <div><span className="font-medium text-gray-600">Email:</span> {student.email}</div>
-                <div><span className="font-medium text-gray-600">Age:</span> {student.age}</div>
-                <div><span className="font-medium text-gray-600">School:</span> {student.school}</div>
-                <div><span className="font-medium text-gray-600">Department:</span> {student.department}</div>
-                <div><span className="font-medium text-gray-600">Disability Type:</span> {student.disabilityType}</div>
-              </div>
-            </div>
+export default function StudentDashboard() {
+  const { user, isAuthenticated, isBootstrapping, login, logout } = useAuth();
+  const [tab, setTab] = useState<Tab>("overview");
 
-            {/* Statistics Cards */}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Statistics</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
-                  <div className="text-2xl font-bold text-blue-700">{statistics.totalCourses}</div>
-                  <div className="text-sm text-gray-600">Total Courses</div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
-                  <div className="text-2xl font-bold text-green-700">{statistics.completedAssignments}</div>
-                  <div className="text-sm text-gray-600">Completed Assignments</div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
-                  <div className="text-2xl font-bold text-purple-700">{statistics.averageGrade}%</div>
-                  <div className="text-sm text-gray-600">Average Grade</div>
-                </div>
-                <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border border-yellow-200">
-                  <div className="text-2xl font-bold text-yellow-700">{statistics.attendanceRate}%</div>
-                  <div className="text-sm text-gray-600">Attendance Rate</div>
-                </div>
-                <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
-                  <div className="text-2xl font-bold text-red-700">{statistics.attendedSessions}/{statistics.totalSessions}</div>
-                  <div className="text-sm text-gray-600">Sessions Attended</div>
-                </div>
-              </div>
-            </div>
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
-            {/* Recent Activity Preview */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <h3 className="font-semibold text-gray-800 mb-3">Recent Assignments</h3>
-                {assignments.slice(0, 2).map(assignment => (
-                  <div key={assignment.id} className="flex justify-between items-center py-2 border-b">
-                    <div><div className="font-medium">{assignment.title}</div><div className="text-sm text-gray-500">{assignment.course}</div></div>
-                    <span className={`px-2 py-1 rounded text-xs ${assignment.status === 'graded' ? 'bg-green-100 text-green-700' : assignment.status === 'submitted' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{assignment.status}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <h3 className="font-semibold text-gray-800 mb-3">Upcoming Sessions</h3>
-                {courses.slice(0, 2).map(course => (
-                  <div key={course.id} className="py-2 border-b">
-                    <div className="font-medium">{course.name}</div>
-                    <div className="text-sm text-gray-500">Next session: {course.nextSession}</div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mt-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: `${course.progress}%` }}></div></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-      case 'My Courses':
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map(course => (
-              <div key={course.id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition">
-                <h3 className="text-lg font-semibold text-gray-800">{course.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">Instructor: {course.instructor}</p>
-                <div className="mt-4"><div className="text-sm text-gray-600 mb-1">Progress: {course.progress}%</div><div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: `${course.progress}%` }}></div></div></div>
-                <p className="text-sm text-gray-500 mt-3">Next session: {course.nextSession}</p>
-                <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">View Course</button>
-              </div>
-            ))}
-          </div>
-        );
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [courses, setCourses] = useState<DashboardCourse[]>([]);
+  const [sessions, setSessions] = useState<DashboardSession[]>([]);
+  const [submissions, setSubmissions] = useState<DashboardSubmission[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
-      case 'Assignments':
-        return (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-            <table className="w-full">
-              <thead className="bg-gray-50"><tr><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grade</th></tr></thead>
-              <tbody className="divide-y divide-gray-200">
-                {assignments.map(assignment => (<tr key={assignment.id}><td className="px-6 py-4">{assignment.title}</td><td className="px-6 py-4">{assignment.course}</td><td className="px-6 py-4">{assignment.dueDate}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs ${assignment.status === 'graded' ? 'bg-green-100 text-green-700' : assignment.status === 'submitted' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{assignment.status}</span></td><td className="px-6 py-4">{assignment.grade || '-'}</td></tr>))}
-              </tbody>
-            </table>
-          </div>
-        );
+  const isStudentUser = ["student", "admin", "superuser"].includes((user?.role ?? "").toLowerCase());
 
-      case 'Sessions':
-        return (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-            <table className="w-full">
-              <thead className="bg-gray-50"><tr><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th></tr></thead>
-              <tbody className="divide-y divide-gray-200">
-                {sessions.map(session => (<tr key={session.id}><td className="px-6 py-4">{session.courseName}</td><td className="px-6 py-4">{session.date}</td><td className="px-6 py-4">{session.time}</td><td className="px-6 py-4">{session.duration}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs ${session.attended ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{session.attended ? 'Attended' : 'Missed'}</span></td></tr>))}
-              </tbody>
-            </table>
-          </div>
-        );
-
-      case 'Analytics':
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl p-6 border border-gray-100"><h3 className="font-semibold text-gray-800 mb-4">Performance Overview</h3><div className="space-y-3"><div><div className="flex justify-between text-sm"><span>Assignments Completion</span><span>92%</span></div><div className="w-full bg-gray-200 rounded-full h-2 mt-1"><div className="bg-blue-600 h-2 rounded-full" style={{ width: '92%' }}></div></div></div><div><div className="flex justify-between text-sm"><span>Attendance Rate</span><span>92%</span></div><div className="w-full bg-gray-200 rounded-full h-2 mt-1"><div className="bg-green-600 h-2 rounded-full" style={{ width: '92%' }}></div></div></div><div><div className="flex justify-between text-sm"><span>Average Grade</span><span>87%</span></div><div className="w-full bg-gray-200 rounded-full h-2 mt-1"><div className="bg-purple-600 h-2 rounded-full" style={{ width: '87%' }}></div></div></div></div></div>
-              <div className="bg-white rounded-xl p-6 border border-gray-100"><h3 className="font-semibold text-gray-800 mb-4">Course Progress</h3><div className="space-y-4">{courses.map(course => (<div key={course.id}><div className="flex justify-between text-sm"><span>{course.name}</span><span>{course.progress}%</span></div><div className="w-full bg-gray-200 rounded-full h-2 mt-1"><div className="bg-blue-600 h-2 rounded-full" style={{ width: `${course.progress}%` }}></div></div></div>))}</div></div>
-            </div>
-          </div>
-        );
-
-      case 'Settings':
-        return (
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 max-w-2xl">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Settings</h2>
-            <div className="space-y-4"><div><label className="block text-sm font-medium text-gray-700 mb-1">Email Notifications</label><select className="w-full border border-gray-300 rounded-lg p-2"><option>All notifications</option><option>Only assignments</option><option>None</option></select></div><div><label className="block text-sm font-medium text-gray-700 mb-1">Language</label><select className="w-full border border-gray-300 rounded-lg p-2"><option>English</option><option>Swahili</option></select></div><div><label className="block text-sm font-medium text-gray-700 mb-1">Theme</label><select className="w-full border border-gray-300 rounded-lg p-2"><option>Light</option><option>Dark</option></select></div><button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Save Changes</button></div>
-          </div>
-        );
-
-      default:
-        return <div className="text-center py-10 text-gray-500">Coming soon...</div>;
+  const loadAll = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [p, c, s, sub, st] = await Promise.all([
+        apiRequest<StudentProfile>("/profile/student/", { auth: true }),
+        fetchAllPages<DashboardCourse>("/dashboard/modules/", { auth: true }),
+        fetchAllPages<DashboardSession>("/dashboard/sessions/", { auth: true }),
+        fetchAllPages<DashboardSubmission>("/dashboard/submissions/", { auth: true }),
+        apiRequest<DashboardStats>("/dashboard/stats/", { auth: true }).catch(() => null),
+      ]);
+      setProfile(p);
+      setCourses(c);
+      setSessions(s);
+      setSubmissions(sub);
+      setStats(st);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load student dashboard.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Ribbon */}
-      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-3 overflow-x-auto whitespace-nowrap">
-            <div className="flex space-x-1 sm:space-x-4">
-              {tabs.map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-3 sm:px-4 py-2 text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
-                    activeTab === tab
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-            <div className="text-sm text-gray-500 font-mono bg-gray-100 px-3 py-1 rounded-lg ml-4">
-              {currentTime}
-            </div>
-          </div>
+  useEffect(() => {
+    if (isAuthenticated && isStudentUser) loadAll();
+  }, [isAuthenticated, isStudentUser]);
+
+  const numbers = useMemo(() => {
+    const totalCourses = courses.length;
+    const completedCourses = courses.filter((c) => !!c.completed_at).length;
+    const avgProgress = totalCourses
+      ? Math.round(courses.reduce((sum, c) => sum + (c.progress_percent || 0), 0) / totalCourses)
+      : 0;
+    const graded = submissions.filter((s) => s.status.toLowerCase().includes("grade") || !!s.grade).length;
+    return {
+      totalCourses,
+      completedCourses,
+      avgProgress,
+      assignments: submissions.length,
+      graded,
+      sessions: sessions.length,
+    };
+  }, [courses, submissions, sessions]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    const result = await login(username.trim(), password);
+    if (!result.ok) {
+      setLoginError(result.error);
+      return;
+    }
+    setUsername("");
+    setPassword("");
+  };
+
+  if (isBootstrapping) {
+    return <div className="min-h-screen flex items-center justify-center">Loading session...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+        <form onSubmit={handleLogin} className="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+          <h1 className="text-xl font-black text-slate-900">Student Sign In</h1>
+          <input value={username} onChange={(e) => setUsername(e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2" placeholder="Username" required />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-slate-300 rounded-lg px-3 py-2" placeholder="Password" required />
+          {loginError && <p className="text-sm text-red-600">{loginError}</p>}
+          <button type="submit" className="w-full text-white rounded-lg py-2 font-semibold" style={{ backgroundColor: BRAND }}>Sign In</button>
+        </form>
+      </div>
+    );
+  }
+
+  if (!isStudentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+        <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 text-center">
+          <h2 className="text-xl font-black text-slate-900">Student Access Required</h2>
+          <p className="text-sm text-slate-500 mt-2">This account cannot access the student dashboard.</p>
+          <button onClick={logout} className="mt-4 text-white rounded-lg py-2 px-4 font-semibold" style={{ backgroundColor: BRAND }}>Sign Out</button>
         </div>
       </div>
+    );
+  }
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {renderContent()}
+  return (
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#e0f2fe_0%,_#f0f9ff_35%,_#f8fafc_70%)]">
+      <header className="text-white" style={{ background: `linear-gradient(90deg, ${BRAND} 0%, #0073ad 55%, #00669a 100%)` }}>
+        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan-100 font-semibold">BrailleEd</p>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight">Student Dashboard</h1>
+            <p className="text-sm text-cyan-100 mt-1">Track your learning progress and activities</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={loadAll} className="bg-white/15 hover:bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm font-semibold">Refresh</button>
+            <button onClick={logout} className="bg-white rounded-lg px-4 py-2 text-sm font-semibold" style={{ color: BRAND }}>Sign Out</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-6 space-y-5">
+        <div className="bg-white/90 backdrop-blur border border-slate-200 rounded-2xl p-3 flex flex-wrap gap-2 shadow-sm">
+          {(["overview", "courses", "assignments", "sessions", "profile"] as Tab[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition ${tab === t ? "text-white shadow" : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100"}`}
+              style={tab === t ? { backgroundColor: BRAND } : undefined}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>}
+        {loading && <p className="text-sm text-slate-600 bg-white border border-slate-200 rounded-lg px-4 py-3">Loading...</p>}
+
+        {tab === "overview" && (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <Stat label="Courses" value={numbers.totalCourses} />
+              <Stat label="Completed" value={numbers.completedCourses} />
+              <Stat label="Avg Progress" value={`${numbers.avgProgress}%`} />
+              <Stat label="Assignments" value={numbers.assignments} />
+              <Stat label="Graded" value={numbers.graded} />
+              <Stat label="Sessions" value={numbers.sessions} />
+            </div>
+            {stats && (
+              <div className={`${card} p-5`}>
+                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 mb-3">Learning Streak</h3>
+                <div className="grid sm:grid-cols-3 gap-3 text-sm">
+                  <div><span className="text-slate-500">Points:</span> <span className="font-semibold">{stats.points_total}</span></div>
+                  <div><span className="text-slate-500">Current streak:</span> <span className="font-semibold">{stats.current_streak}</span></div>
+                  <div><span className="text-slate-500">Longest streak:</span> <span className="font-semibold">{stats.longest_streak}</span></div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === "courses" && (
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {courses.map((item) => (
+              <div key={item.course.id} className={`${card} p-5`}>
+                <h3 className="font-bold text-slate-900">{item.course.title}</h3>
+                <p className="text-sm text-slate-500 mt-1 line-clamp-3">{item.course.description}</p>
+                <div className="mt-4">
+                  <div className="flex justify-between text-xs text-slate-500 mb-1"><span>Progress</span><span>{item.progress_percent || 0}%</span></div>
+                  <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${item.progress_percent || 0}%`, backgroundColor: BRAND }} />
+                  </div>
+                </div>
+                <p className="text-xs mt-3" style={{ color: item.completed_at ? "#15803d" : "#64748b" }}>
+                  {item.completed_at ? `Completed: ${new Date(item.completed_at).toLocaleDateString()}` : "In progress"}
+                </p>
+              </div>
+            ))}
+            {courses.length === 0 && <div className={`${card} p-5 text-sm text-slate-500`}>No course progress available yet.</div>}
+          </div>
+        )}
+
+        {tab === "assignments" && (
+          <div className={`${card} overflow-auto`}>
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Title</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Course</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Submitted</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Status</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.map((s) => (
+                  <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50/70">
+                    <td className="px-4 py-3">
+                      <div className="font-semibold text-slate-900">{s.assignment?.title}</div>
+                      {s.assignment?.due_at && <div className="text-xs text-slate-500">Due: {new Date(s.assignment.due_at).toLocaleString()}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700">{s.assignment?.course?.title}</td>
+                    <td className="px-4 py-3 text-slate-700">{new Date(s.submitted_at).toLocaleString()}</td>
+                    <td className="px-4 py-3"><span className="px-2 py-1 rounded text-xs bg-slate-100 text-slate-700">{s.status}</span></td>
+                    <td className="px-4 py-3 text-slate-700">{s.grade || "-"}</td>
+                  </tr>
+                ))}
+                {submissions.length === 0 && (
+                  <tr><td colSpan={5} className="px-4 py-6 text-center text-slate-500">No submissions found.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {tab === "sessions" && (
+          <div className={`${card} overflow-auto`}>
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Title</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Start</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>End</th>
+                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider" style={{ color: BRAND }}>Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sessions.map((s) => (
+                  <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50/70">
+                    <td className="px-4 py-3 font-semibold text-slate-900">{s.title}</td>
+                    <td className="px-4 py-3 text-slate-700">{new Date(s.start_at).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-slate-700">{new Date(s.end_at).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-slate-700">{s.location || "-"}</td>
+                  </tr>
+                ))}
+                {sessions.length === 0 && (
+                  <tr><td colSpan={4} className="px-4 py-6 text-center text-slate-500">No sessions scheduled.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {tab === "profile" && profile && (
+          <div className={`${card} p-5 max-w-2xl`}>
+            <h2 className="text-lg font-black text-slate-900 mb-3">Student Profile</h2>
+            <div className="grid sm:grid-cols-2 gap-3 text-sm">
+              <div><span className="text-slate-500">Username:</span> <span className="font-semibold">{profile.username}</span></div>
+              <div><span className="text-slate-500">Email:</span> <span className="font-semibold">{profile.email}</span></div>
+              <div><span className="text-slate-500">Age:</span> <span className="font-semibold">{profile.age}</span></div>
+              <div><span className="text-slate-500">School ID:</span> <span className="font-semibold">{profile.school}</span></div>
+              <div className="sm:col-span-2"><span className="text-slate-500">Disability Type:</span> <span className="font-semibold">{profile.disability_type}</span></div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
-};
-
-export default StudentDashboard;
+}
