@@ -11,10 +11,10 @@ import { MAIL_KIT } from "../lib/landing-mailto";
 const LOGO = "/Braille%20bot%20%20Bio.png";
 
 
-const ELECTRIC_BLUE = "#1E90FF";         
-const ELECTRIC_BLUE_DARK = "#0066CC";     
-const ELECTRIC_BLUE_DEEPER = "#004999";    
-const ELECTRIC_BLUE_LIGHT = "#4DA6FF";    
+const ELECTRIC_BLUE = "#0088ce";         
+const ELECTRIC_BLUE_DARK = "#0088ce";     
+const ELECTRIC_BLUE_DEEPER = "#0088ce";    
+const ELECTRIC_BLUE_LIGHT = "#0088ce";    
 const ELECTRIC_BLUE_GLOW = "rgba(0, 102, 204, 0.12)";
 
 const DISABILITY_TYPES: DisabilityType[] = ["Blind (congenital)", "Blind (acquired)", "Low vision / progressive", "Low vision (stable)", "Other"];

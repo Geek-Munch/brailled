@@ -3,8 +3,12 @@ import { AccessibilityPanel } from "../components/AccessibilityPanel";
 import { RevealSection } from "../components/RevealSection";
 import { GalleryCarousel } from "../components/GalleryCarousel";
 import { MAIL_CONTACT, MAIL_DEMO, MAIL_KIT, MAIL_PLAIN } from "../lib/landing-mailto";
-import { Play, Calendar, Menu, X } from "lucide-react";
+import { Play, Calendar, Menu, X, ArrowRight, MapPin } from "lucide-react";
 import { animate, useInView } from "framer-motion";
+import { SAMPLE_EVENTS } from '../data/events';
+
+const BRAND_BLUE = "#0088ce";
+const BRAND_BLUE_GLOW = "rgba(0, 136, 206, 0.15)";
 
 // TeamCards hover 
 function TeamCard({ member }: { member: { src: string; name: string; role: string } }) {
@@ -27,17 +31,13 @@ function TeamCard({ member }: { member: { src: string; name: string; role: strin
           <span className="text-slate-400 text-6xl font-black uppercase">{member.name[0]}</span>
         </div>
       )}
-
-      {/* Always-visible name */}
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-16 bg-gradient-to-t from-slate-900/75 via-slate-900/30 to-transparent pointer-events-none">
         <p className="text-white font-black text-base uppercase tracking-tight leading-snug">{member.name}</p>
       </div>
-
-      {/* Hover overlay,opacity driven by JS  */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 flex flex-col justify-end px-5 pb-5 bg-gradient-to-t from-blue-700/90 via-blue-600/40 to-transparent pointer-events-none"
-        style={{ opacity: 0, transition: "opacity 0.3s ease" }}
+        className="absolute inset-0 flex flex-col justify-end px-5 pb-5 pointer-events-none"
+        style={{ opacity: 0, transition: "opacity 0.3s ease", background: `linear-gradient(to top, ${BRAND_BLUE}E6, ${BRAND_BLUE}66, transparent)` }}
       >
         <p className="text-white font-black text-lg uppercase tracking-tight leading-tight mb-1">{member.name}</p>
         <p className="text-blue-200 text-xs font-bold uppercase tracking-[0.15em]">{member.role}</p>
@@ -45,6 +45,7 @@ function TeamCard({ member }: { member: { src: string; name: string; role: strin
     </div>
   );
 }
+
 function CountingNumber({ value }: { value: number }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
@@ -72,19 +73,15 @@ const KIT_PHOTOS: readonly { src: string; alt: string }[] = [
   { src: "/IMG_0438.JPG.jpeg", alt: "Close-up of robotics kit pieces used for coding and engineering activities" },
 ];
 
-/*
-  TEAM MEMBERS 
-*/
+/* TEAM MEMBERS */
 const TEAM_MEMBERS = [
-  { src: "maxwell.jpeg",  name: "Maxwell Kamau",    role: "Founder & CEO"                    },
-  { src: "patricia.jpeg", name: "Patricia Wanjiru", role: "Co-founder"                        },
-  { src: "ann.jpeg",      name: "Ann Nyokabi",      role: "Co-founder" },
-  { src: "johndoe2.jpeg", name: "John Doe2",        role: "Lead Engineer"                     },
-  { src: "mokaya.jpeg",   name: "Brian Mokaya",     role: "Software Developer"                },
-  { src: "Mungai.jpeg",   name: "Ruth Mungai",      role: "Software Developer"                },
-  { src: "erick.JPG",   name: "Erick Mutua",      role: "Backend Developer"                 },
-  { src: "victor.jpeg",   name: "Victor Munene",    role: "Web & Software Developer"          },
-  { src: "isaiah.jpeg",   name: "Isaiah Wambani",   role: "Frontend Developer"                },
+  { src: "maxwell.jpeg",  name: "Maxwell Kamau",    role: "Founder & CEO"      },
+  { src: "patricia.jpeg", name: "Patricia Wanjiru", role: "Co-founder"          },
+  { src: "ann.jpeg",      name: "Ann Nyokabi",      role: "Co-founder"          },
+  { src: "johndoe2.jpeg", name: "John Doe2",        role: "Lead Engineer"       },
+  { src: "mokaya.jpeg",   name: "Brian Mokaya",     role: "Software Developer"  },
+  { src: "Mungai.jpeg",   name: "Ruth Mungai",      role: "Software Developer"  },
+  { src: "erick.JPG",     name: "Erick Mutua",      role: "Backend Developer"   },
 ];
 
 export function LandingPage() {
@@ -98,7 +95,6 @@ export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Team carousel auto-scroll
   const [teamScrollPaused, setTeamScrollPaused] = useState(false);
   const teamCarouselRef = useRef<HTMLDivElement>(null);
   const teamScrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -146,7 +142,6 @@ export function LandingPage() {
   const closeKitLightbox = useCallback(() => setKitLightbox(null), []);
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
-  // Close mobile menu on desktop resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) setMobileMenuOpen(false);
@@ -155,7 +150,6 @@ export function LandingPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Hide/show header on scroll + transparent/solid switch
   useEffect(() => {
     const controlHeader = () => {
       setScrolled(window.scrollY > 80);
@@ -170,7 +164,6 @@ export function LandingPage() {
     return () => window.removeEventListener("scroll", controlHeader);
   }, [lastScrollY]);
 
-  // Admin keyboard shortcut: Ctrl+Shift+A / Cmd+Shift+A
   useEffect(() => {
     const handleAdminShortcut = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "A") {
@@ -182,19 +175,17 @@ export function LandingPage() {
     return () => window.removeEventListener("keydown", handleAdminShortcut);
   }, []);
 
-  // Educator dashboard shortcut: Ctrl+Shift+E / Cmd+Shift+E
-useEffect(() => {
-  const handleEducatorShortcut = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "E") {
-      e.preventDefault();
-      window.location.href = "/educator";
-    }
-  };
-  window.addEventListener("keydown", handleEducatorShortcut);
-  return () => window.removeEventListener("keydown", handleEducatorShortcut);
-}, []);
+  useEffect(() => {
+    const handleEducatorShortcut = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "E") {
+        e.preventDefault();
+        window.location.href = "/educator";
+      }
+    };
+    window.addEventListener("keydown", handleEducatorShortcut);
+    return () => window.removeEventListener("keydown", handleEducatorShortcut);
+  }, []);
 
-  // Secret admin access: triple-tap logo (mobile)
   useEffect(() => {
     let tapCount = 0;
     let tapTimer: ReturnType<typeof setTimeout>;
@@ -215,7 +206,6 @@ useEffect(() => {
     }
   }, []);
 
-  // Lightbox keyboard + scroll lock
   useEffect(() => {
     if (kitLightbox === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -237,7 +227,7 @@ useEffect(() => {
         Skip to main content
       </a>
 
-      {/* ─── HEADER ─── */}
+      {/* HEADER */}
       <header
         className={`fixed top-0 w-full z-[100] px-4 sm:px-6 lg:px-16 py-3 sm:py-4 transition-all duration-500
           ${showHeader ? "translate-y-0" : "-translate-y-full"}
@@ -247,22 +237,20 @@ useEffect(() => {
           }`}
       >
         <div className="flex justify-between items-center">
-          {/* Logo — triple-tap for secret admin access on mobile */}
           <a className="flex items-center admin-secret-tap" href="/" aria-label="BrailleEd home">
             <img
               src={LOGO}
               alt="BrailleEd Logo"
-              className={`h-16 sm:h-20 md:h-28 w-auto object-contain transition-all origin-left hover:scale-105 cursor-pointer ${scrolled ? "" : "brightness-0 invert"}`}
+              className={`h-28 sm:h-32 md:h-40 lg:h-44 w-auto object-contain transition-all origin-left hover:scale-105 cursor-pointer ${scrolled ? "" : "brightness-0 invert"}`}
             />
           </a>
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-6 xl:gap-10" aria-label="Primary">
-            <a href="#who-we-are" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-blue-400 transition"}>Who we are</a>
-            <a href="#our-team" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-blue-400 transition"}>Our team</a>
-            <a href="#purchase-kit" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-blue-400 transition"}>Purchase a kit</a>
-            <a href="/evidence" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-blue-400 transition"}>User Evidence</a>
-            {/*<a href="https://bunifuyouths.org" target="_blank" rel="noopener noreferrer" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-blue-400 transition"}>Bunifu Youths</a>*/}
+            <a href="#who-we-are" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-[#0088ce] transition"}>Who we are</a>
+            <a href="#our-team" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-[#0088ce] transition"}>Our team</a>
+            <a href="#purchase-kit" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-[#0088ce] transition"}>Purchase a kit</a>
+            <a href="/evidence" className={scrolled ? "text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition" : "text-xs font-bold uppercase tracking-widest text-white hover:text-[#0088ce] transition"}>User Evidence</a>
 
             <div className="flex items-center gap-3 xl:gap-4 ml-2 xl:ml-4">
               <a
@@ -271,12 +259,13 @@ useEffect(() => {
                 rel="noopener noreferrer"
                 className={`text-xs font-bold uppercase tracking-widest px-4 xl:px-6 py-2 xl:py-2.5 border-2 transition
                   ${scrolled
-                    ? "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                    ? `border-[${BRAND_BLUE}] text-[${BRAND_BLUE}] hover:bg-[${BRAND_BLUE}] hover:text-white`
                     : "border-white text-white hover:bg-white hover:text-slate-900"}`}
+                style={scrolled ? { borderColor: BRAND_BLUE, color: BRAND_BLUE } : {}}
               >
                 Book a demo
               </a>
-              <a href="/playground/" onClick={(e) => { e.preventDefault(); window.location.href = "/playground/"; }} className="text-xs font-bold uppercase tracking-widest bg-blue-600 text-white px-4 xl:px-6 py-2 xl:py-2.5 hover:bg-blue-700 transition">
+              <a href="/playground/" onClick={(e) => { e.preventDefault(); window.location.href = "/playground/"; }} className="text-xs font-bold uppercase tracking-widest text-white px-4 xl:px-6 py-2 xl:py-2.5 transition" style={{ backgroundColor: BRAND_BLUE }}>
                 Open playground
               </a>
             </div>
@@ -285,7 +274,7 @@ useEffect(() => {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`lg:hidden p-2 rounded-md transition ${scrolled ? "text-slate-600 hover:text-blue-600" : "text-white hover:text-blue-300"}`}
+            className={`lg:hidden p-2 rounded-md transition ${scrolled ? "text-slate-600 hover:text-[#0088ce]" : "text-white hover:text-[#0088ce]"}`}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
           >
@@ -297,14 +286,13 @@ useEffect(() => {
         {mobileMenuOpen && (
           <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-lg z-50">
             <nav className="flex flex-col p-4 space-y-3" aria-label="Mobile navigation">
-              <a href="#who-we-are" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition py-2">Who we are</a>
-              <a href="#our-team" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition py-2">Our team</a>
-              <a href="#purchase-kit" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition py-2">Purchase a kit</a>
-              <a href="/evidence" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition py-2">User Evidence</a>
-              {/*<a href="https://bunifuyouths.org" onClick={closeMobileMenu} target="_blank" rel="noopener noreferrer" className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition py-2">Bunifu Youths</a>*/}
+              <a href="#who-we-are" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition py-2">Who we are</a>
+              <a href="#our-team" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition py-2">Our team</a>
+              <a href="#purchase-kit" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition py-2">Purchase a kit</a>
+              <a href="/evidence" onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest text-slate-600 hover:text-[#0088ce] transition py-2">User Evidence</a>
               <div className="border-t border-slate-200 my-2" />
-              <a href={MAIL_DEMO} onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest border-2 border-blue-600 text-blue-600 px-4 py-2 text-center hover:bg-blue-600 hover:text-white transition">Book a demo</a>
-              <a href="/playground/" onClick={(e) => { e.preventDefault(); closeMobileMenu(); window.location.href = "/playground/"; }} className="text-sm font-bold uppercase tracking-widest bg-slate-900 text-white px-4 py-2 text-center hover:bg-blue-700 transition">Open playground</a>
+              <a href={MAIL_DEMO} onClick={closeMobileMenu} className="text-sm font-bold uppercase tracking-widest border-2 px-4 py-2 text-center transition" style={{ borderColor: BRAND_BLUE, color: BRAND_BLUE }}>Book a demo</a>
+              <a href="/playground/" onClick={(e) => { e.preventDefault(); closeMobileMenu(); window.location.href = "/playground/"; }} className="text-sm font-bold uppercase tracking-widest bg-slate-900 text-white px-4 py-2 text-center transition" style={{ backgroundColor: BRAND_BLUE }}>Open playground</a>
             </nav>
           </div>
         )}
@@ -312,7 +300,7 @@ useEffect(() => {
 
       <main id="main-content">
 
-        {/* ─── HERO ─── */}
+        {/* HERO */}
         <section className="relative min-h-screen flex items-start justify-center bg-slate-900 pt-36 pb-16">
           <video
             ref={videoRef}
@@ -323,7 +311,6 @@ useEffect(() => {
           </video>
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" aria-hidden="true" />
 
-          {/* Pause / Play button */}
           <button
             onClick={toggleVideo}
             aria-label={videoPaused ? "Play background video" : "Pause background video"}
@@ -347,162 +334,77 @@ useEffect(() => {
             )}
           </button>
 
-          <div className="relative z-10 text-center px-6 w-full max-w-5xl xl:max-w-6xl mx-auto mt-16 md:mt-20">
-            <p className="text-blue-400 font-bold uppercase tracking-[0.3em] mb-4 text-sm animate-pulse">
-              Program · Simulate · Learn
-            </p>
-            <h1 className="text-5xl md:text-8xl xl:text-9xl font-black text-white uppercase tracking-tighter mb-8 leading-[0.95]">
-              Visually impaired <br /> students <span className="text-blue-500">can now code.</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-slate-200 mb-6 max-w-3xl mx-auto font-light leading-relaxed">
-              43.3 million blind people globally are under-represented in STEM. We are changing that with inclusive robotics kits designed specifically for visually impaired learners.
-            </p>
-            <p className="mb-10 text-slate-400 text-sm font-medium">
-              <strong>Free to use.</strong> No account or sign-in required.
-            </p>
-            <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
-              <a href="/playground/" onClick={(e) => { e.preventDefault(); window.location.href = "/playground/"; }} className="w-full md:w-auto bg-blue-600 text-white px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-blue-700 transition shadow-2xl flex items-center justify-center gap-2">
-                Try the playground <Play size={16} />
-              </a>
-              <a href={MAIL_DEMO} className="w-full md:w-auto bg-white text-slate-900 px-10 py-5 text-sm font-bold uppercase tracking-widest hover:bg-slate-100 transition flex items-center justify-center gap-2">
-                Book a demo <Calendar size={16} />
-              </a>
+          {/* Hero text */}
+          <div className="relative z-10 flex flex-col justify-center items-center text-center min-h-[calc(100vh-200px)] px-4 sm:px-6 w-full mx-auto">
+            <div className="w-full max-w-7xl mx-auto">
+              <p className="text-blue-400 font-bold uppercase tracking-[0.3em] mb-6 text-xs sm:text-sm md:text-base animate-pulse">
+                Program · Simulate · Learn
+              </p>
+              
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white uppercase tracking-tighter mb-4">
+                Visually impaired <span className="whitespace-nowrap">students</span>
+              </h1>
+              
+              <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white uppercase tracking-tighter mb-8">
+                <span className="text-blue-500">can now code.</span>
+              </h2>
+              
+              <p className="text-base md:text-lg lg:text-xl text-slate-200 mb-8 max-w-3xl mx-auto font-light leading-relaxed px-4">
+                43.3 million blind people globally are under-represented in STEM. We are changing that with inclusive robotics kits designed specifically for visually impaired learners.
+              </p>
+              
+              <p className="mb-10 text-slate-400 text-xs sm:text-sm font-medium">
+                <strong>Free to use.</strong> No account or sign-in required.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center px-4">
+                <a href="/playground/" onClick={(e) => { e.preventDefault(); window.location.href = "/playground/"; }} className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-blue-700 transition shadow-2xl rounded-md">
+                  Try the playground <Play size={16} />
+                </a>
+                <a href={MAIL_DEMO} className="inline-flex items-center justify-center gap-2 bg-white text-slate-900 px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-bold uppercase tracking-widest hover:bg-slate-100 transition rounded-md">
+                  Book a demo <Calendar size={16} />
+                </a>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ─── WHO WE ARE ─── */}
+        {/* WHO WE ARE */}
         <RevealSection className="py-24 bg-slate-50 px-6 lg:px-24" id="who-we-are">
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
-            <div className="lg:w-[55%] border-l-8 border-blue-600 pl-8">
+            <div className="lg:w-[55%] pl-8" style={{ borderLeft: `8px solid ${BRAND_BLUE}` }}>
               <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-slate-900 mb-6">Who we are</h2>
               <p className="text-lg text-slate-600 leading-relaxed mb-6 font-light">
-                BrailleEd builds robotics and coding learning tools for blind and visually impaired students in Kenya.
+                We create inclusive STEM learning aids for blind and visually impared learners to access quality education.
               </p>
               <p className="text-base text-slate-600 leading-relaxed font-light">
-                We design accessible kits and lesson materials that work for learners who cannot use standard screens or printed resources, ensuring no student is left behind in the digital revolution.
+                Our goal is to develop a strong community of visually impared youths equipped with STEM tools to drive innovation, promote quality education and build economically independent futures
               </p>
             </div>
-            {/* who we are image */}
             <div className="lg:w-[45%] overflow-hidden rounded-sm shadow-2xl">
               <img
-                src="who we are.jpeg"
-                alt="who we are image"
+                src="IMG_2034.jpg"
+                alt="IMG_2034"
                 className="w-full h-[420px] xl:h-[520px] object-cover"
               />
             </div>
           </div>
         </RevealSection>
 
-        {/* ─── OUR TEAM ─── */}
-        <RevealSection className="py-24 bg-white px-6 lg:px-24" id="our-team">
-          <div className="max-w-7xl mx-auto">
-
-            <div className="flex items-start justify-between mb-16">
-              <div className="border-l-8 border-blue-600 pl-8">
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-4">Our Team</h2>
-                <p className="text-xl text-slate-500 max-w-2xl font-light">
-                  The people behind BrailleEd — passionate about inclusive education and technology.
-                </p>
-              </div>
-
-              {/* Auto-scroll pause/play */}
-              <button
-                onClick={() => setTeamScrollPaused((p) => !p)}
-                aria-label={teamScrollPaused ? "Resume team carousel" : "Pause team carousel"}
-                className="flex-shrink-0 flex items-center gap-2 border-2 border-slate-300 hover:border-blue-600 hover:text-blue-600 text-slate-700 text-xs font-bold uppercase tracking-widest px-5 py-2.5 transition-all bg-white"
-              >
-                {teamScrollPaused ? (
-                  <>
-                    <svg width="10" height="12" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true">
-                      <path d="M0 0L12 7L0 14V0Z" />
-                    </svg>
-                    Resume
-                  </>
-                ) : (
-                  <>
-                    <svg width="10" height="12" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true">
-                      <rect x="0" y="0" width="4" height="14" />
-                      <rect x="8" y="0" width="4" height="14" />
-                    </svg>
-                    Pause
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Carousel track */}
-            <div
-              ref={teamCarouselRef}
-              className="flex gap-3 overflow-x-auto scroll-smooth"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              onMouseEnter={() => stopTeamScroll()}
-              onMouseLeave={() => { if (!teamScrollPaused) startTeamScroll(); }}
-            >
-              {TEAM_MEMBERS.map((member, i) => (
-                <TeamCard key={i} member={member} />
-              ))}
-            </div>
-
-            {/* Bottom controls: prev · dots · next */}
-            <div className="flex items-center justify-between mt-8">
-              <button
-                onClick={() => {
-                  stopTeamScroll();
-                  const el = teamCarouselRef.current;
-                  if (el) el.scrollBy({ left: -263, behavior: "smooth" });
-                  if (!teamScrollPaused) setTimeout(startTeamScroll, 3000);
-                }}
-                aria-label="Scroll team left"
-                className="w-12 h-12 flex items-center justify-center border-2 border-slate-300 hover:border-blue-600 hover:text-blue-600 text-slate-700 text-2xl font-bold transition-all bg-white"
-              >‹</button>
-
-              <div className="flex items-center gap-2">
-                {TEAM_MEMBERS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      stopTeamScroll();
-                      const el = teamCarouselRef.current;
-                      if (el) el.scrollTo({ left: i * 263, behavior: "smooth" });
-                      if (!teamScrollPaused) setTimeout(startTeamScroll, 3000);
-                    }}
-                    className="w-2 h-2 rounded-full bg-slate-300 hover:bg-blue-600 transition-colors"
-                    aria-label={`Go to team member ${i + 1}`}
-                  />
-                ))}
-              </div>
-
-              <button
-                onClick={() => {
-                  stopTeamScroll();
-                  const el = teamCarouselRef.current;
-                  if (el) el.scrollBy({ left: 263, behavior: "smooth" });
-                  if (!teamScrollPaused) setTimeout(startTeamScroll, 3000);
-                }}
-                aria-label="Scroll team right"
-                className="w-12 h-12 flex items-center justify-center border-2 border-slate-300 hover:border-blue-600 hover:text-blue-600 text-slate-700 text-2xl font-bold transition-all bg-white"
-              >›</button>
-            </div>
-          </div>
-        </RevealSection>
-
-        {/* ─── IMPACT ─── */}
+        {/* IMPACT */}
         <RevealSection className="py-24 relative" id="impact">
-          {/* TO CHANGE THIS IMAGE: replace "impact.jpeg" with your own image path */}
           <div className="absolute inset-0 overflow-hidden">
             <img src="impact.jpeg" alt="" aria-hidden="true" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-white/75" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-24 mb-10">
-            <div className="border-l-8 border-blue-600 pl-8">
+            <div className="pl-8" style={{ borderLeft: `8px solid ${BRAND_BLUE}` }}>
               <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter text-slate-900 mb-3">Our Impact</h2>
               <p className="text-lg text-slate-700 max-w-2xl font-light">Working across Kenya to empower blind and visually impaired learners through inclusive robotics.</p>
             </div>
           </div>
 
-          {/* Grids */}
           <div className="relative z-10 px-6 lg:px-24">
             <div className="grid grid-cols-2 md:grid-cols4 gap-2 md:gap-3">
               <div className="bg-slate-100 flex flex-col justify-center px-6 md:px-8 py-6 h-44 md:h-48">
@@ -510,16 +412,15 @@ useEffect(() => {
                 <div className="text-xs font-bold text-slate-600 uppercase tracking-widest leading-snug">Educators Trained</div>
               </div>
               <div className="overflow-hidden group relative h-44 md:h-48">
-                <img src="Seva Canada - Blog.jpg" alt="Educators trained" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src="IMG_2016.jpg" alt="Educators trained" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               </div>
               <div className="overflow-hidden group relative h-44 md:h-48">
-                <img src="download (2).jpg" alt="Strategic partners" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src="DSC08565.JPG" alt="Strategic partners" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               </div>
               <div className="bg-slate-900 flex flex-col justify-center px-6 md:px-8 py-6 h-44 md:h-48">
                 <div className="text-4xl md:text-5xl font-black text-white mb-1"><CountingNumber value={2} /></div>
-                <div className="text-xs font-bold text-blue-100 uppercase tracking-widest leading-snug">Strategic Partners</div>
+                <div className="text-xs font-bold uppercase tracking-widest leading-snug" style={{ color: BRAND_BLUE }}>Strategic Partners</div>
               </div>
-
               <div className="bg-slate-100 flex flex-col justify-center px-6 md:px-8 py-6 h-44 md:h-48">
                 <div className="text-4xl md:text-5xl font-black text-slate-900 mb-1"><CountingNumber value={3} /></div>
                 <div className="text-xs font-bold text-slate-600 uppercase tracking-widest leading-snug">Partner Institutions</div>
@@ -538,35 +439,12 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── ACCESSIBILITY FEATURES ─── */}
-        <RevealSection className="py-24 bg-white px-6 lg:px-24">
-          <div className="max-w-7xl mx-auto">
-            <div className="border-l-8 border-blue-600 pl-8 mb-16">
-              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-4">Designed for Accessibility</h2>
-              <p className="text-xl text-slate-500 max-w-2xl font-light">Built for screen readers, magnification, and speech-to-text learning.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                { title: "Screen reader support", desc: "Live regions announce messages so assistive technology can read them aloud." },
-                { title: "Voice and keyboard",    desc: "Program by speaking commands or typing; navigate with clear focus indicators." },
-                { title: "Guided learning",       desc: "Optional step-by-step mentor in the playground helps you know what to try next." },
-                { title: "Simple layout",         desc: "Skip links and structured headings make it easier to move through the page." },
-              ].map((item, i) => (
-                <div key={i} className="p-8 bg-white border border-slate-100 shadow-sm hover:border-blue-600 transition-all">
-                  <h3 className="text-lg font-bold text-slate-900 mb-3 uppercase tracking-tight">{item.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </RevealSection>
-
-        {/* ─── WHAT YOU CAN DO ─── */}
+        {/* WHAT YOU CAN DO */}
         <RevealSection className="py-24 bg-slate-900 text-white px-6 lg:px-24">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4">What the platform can do</h2>
-              <p className="text-blue-400 font-bold uppercase tracking-widest text-sm">A tactile workspace for clarity and feedback</p>
+              <p className="font-bold uppercase tracking-widest text-sm" style={{ color: BRAND_BLUE }}>A tactile workspace for clarity and feedback</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {[
@@ -575,7 +453,7 @@ useEffect(() => {
                 { id: "03", title: "Robot simulator",      desc: "Run your stack and watch the robot on stage with a text log — no hardware required." },
               ].map((feature) => (
                 <div key={feature.id} className="relative p-10 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                  <span className="absolute top-4 right-6 text-5xl font-black text-white/5 group-hover:text-blue-600/20 transition-colors">{feature.id}</span>
+                  <span className="absolute top-4 right-6 text-5xl font-black text-white/5">{feature.id}</span>
                   <h3 className="text-2xl font-bold mb-4 uppercase tracking-tight">{feature.title}</h3>
                   <p className="text-slate-400 leading-relaxed font-light">{feature.desc}</p>
                 </div>
@@ -584,7 +462,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── VIDEO ─── */}
+        {/* VIDEO */}
         <RevealSection className="py-24 bg-white px-6 lg:px-24 text-center">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-8">See BrailleEd in Action</h2>
@@ -606,10 +484,76 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── PURCHASE KIT ─── */}
+        {/* EVENT GALLERY HIGHLIGHTS */}
+        <RevealSection className="py-24 bg-white px-6 lg:px-24 border-t border-b" id="gallery-highlights" style={{ borderColor: '#e2e8f0' }}>
+          <div className="max-w-7xl mx-auto">
+
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+              <div className="pl-8" style={{ borderLeft: `8px solid ${BRAND_BLUE}` }}>
+                <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: BRAND_BLUE }}>
+                  Moments &amp; Milestones
+                </p>
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-3">
+                  Event Gallery
+                </h2>
+                <p className="text-slate-500 max-w-xl font-light text-lg">
+                  From classrooms to partnerships, have a look at BrailleEd in the world.
+                </p>
+              </div>
+              <a
+                href="/gallery"
+                className="flex-shrink-0 flex items-center gap-3 border-2 px-6 py-3 transition-all self-start md:self-auto hover:text-white"
+                style={{ borderColor: BRAND_BLUE, color: BRAND_BLUE }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = BRAND_BLUE; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = BRAND_BLUE; }}
+              >
+                View Full Gallery <ArrowRight size={14} />
+              </a>
+            </div>
+
+            {/* Responsive grid - all cards same size */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {SAMPLE_EVENTS.slice(0, 6).map((event) => (
+                <div
+                  key={event.id}
+                  onClick={() => window.location.href = `/event/${event.id}`}
+                  className="group bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl border"
+                  style={{ borderColor: '#e2e8f0' }}
+                >
+                  <div className="relative overflow-hidden h-56 bg-slate-100">
+                    <img
+                      src={event.featuredImage}
+                      alt={event.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-3 right-3">
+                      <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/90" style={{ color: BRAND_BLUE }}>
+                        {event.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2">{event.title}</h3>
+                    <p className="text-slate-500 text-sm mb-3 line-clamp-2">{event.description}</p>
+                    <div className="flex items-center gap-4 text-xs text-slate-400 mb-4">
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{event.location}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{event.date}</span>
+                    </div>
+                    <button className="text-sm font-bold uppercase tracking-wider flex items-center gap-1 group-hover:gap-2" style={{ color: BRAND_BLUE }}>
+                      View Gallery <ArrowRight className="w-3 h-3 transition-all group-hover:translate-x-1" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </RevealSection>
+
+        {/* PURCHASE KIT */}
         <RevealSection className="py-24 bg-slate-50 px-6 lg:px-24" id="purchase-kit">
           <div className="max-w-7xl mx-auto">
-            <div className="border-l-8 border-blue-600 pl-8 mb-16">
+            <div className="pl-8 mb-16" style={{ borderLeft: `8px solid ${BRAND_BLUE}` }}>
               <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-4">Purchase a Kit</h2>
               <p className="text-xl text-slate-600 max-w-3xl font-light">
                 Hands-on robotics kits for STEM education. Programmable builds used to teach coding, sensors, and engineering through tactile play.
@@ -624,7 +568,7 @@ useEffect(() => {
                   className="aspect-square overflow-hidden group relative bg-slate-200"
                 >
                   <img src={photo.src} alt={photo.alt} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/20 transition-colors" />
+                  <div className="absolute inset-0 bg-[#0088ce]/0 group-hover:bg-[#0088ce]/20 transition-colors" />
                 </button>
               ))}
             </div>
@@ -641,15 +585,113 @@ useEffect(() => {
               <div className="p-10">
                 <h3 className="text-xl font-black uppercase tracking-tight mb-4 text-slate-900">How to Order</h3>
                 <p className="text-slate-500 text-sm leading-relaxed font-light mb-4">Contact us for school pricing and bundles.</p>
-                <a href={MAIL_KIT} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold uppercase text-xs tracking-widest hover:underline">Email Now →</a>
+                <a href={MAIL_KIT} target="_blank" rel="noopener noreferrer" className="font-bold uppercase text-xs tracking-widest hover:underline" style={{ color: BRAND_BLUE }}>Email Now →</a>
               </div>
+            </div>
+          </div>
+        </RevealSection>
+
+        {/* OUR TEAM */}
+        <RevealSection className="py-24 bg-white px-6 lg:px-24" id="our-team">
+          <div className="max-w-7xl mx-auto">
+
+            <div className="flex items-start justify-between mb-16">
+              <div className="pl-8" style={{ borderLeft: `8px solid ${BRAND_BLUE}` }}>
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-4">Our Team</h2>
+                <p className="text-xl text-slate-500 max-w-2xl font-light">
+                  The people behind BrailleEd — passionate about inclusive education and technology.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setTeamScrollPaused((p) => !p)}
+                aria-label={teamScrollPaused ? "Resume team carousel" : "Pause team carousel"}
+                className="flex-shrink-0 flex items-center gap-2 border-2 border-slate-300 text-slate-700 text-xs font-bold uppercase tracking-widest px-5 py-2.5 transition-all bg-white"
+                onMouseEnter={e => { e.currentTarget.style.borderColor = BRAND_BLUE; e.currentTarget.style.color = BRAND_BLUE; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.color = ""; }}
+              >
+                {teamScrollPaused ? (
+                  <>
+                    <svg width="10" height="12" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true">
+                      <path d="M0 0L12 7L0 14V0Z" />
+                    </svg>
+                    Resume
+                  </>
+                ) : (
+                  <>
+                    <svg width="10" height="12" viewBox="0 0 12 14" fill="currentColor" aria-hidden="true">
+                      <rect x="0" y="0" width="4" height="14" />
+                      <rect x="8" y="0" width="4" height="14" />
+                    </svg>
+                    Pause
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div
+              ref={teamCarouselRef}
+              className="flex gap-3 overflow-x-auto scroll-smooth"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              onMouseEnter={() => stopTeamScroll()}
+              onMouseLeave={() => { if (!teamScrollPaused) startTeamScroll(); }}
+            >
+              {TEAM_MEMBERS.map((member, i) => (
+                <TeamCard key={i} member={member} />
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between mt-8">
+              <button
+                onClick={() => {
+                  stopTeamScroll();
+                  const el = teamCarouselRef.current;
+                  if (el) el.scrollBy({ left: -263, behavior: "smooth" });
+                  if (!teamScrollPaused) setTimeout(startTeamScroll, 3000);
+                }}
+                aria-label="Scroll team left"
+                className="w-12 h-12 flex items-center justify-center border-2 border-slate-300 text-slate-700 text-2xl font-bold transition-all bg-white"
+                onMouseEnter={e => { e.currentTarget.style.borderColor = BRAND_BLUE; e.currentTarget.style.color = BRAND_BLUE; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.color = ""; }}
+              >‹</button>
+
+              <div className="flex items-center gap-2">
+                {TEAM_MEMBERS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      stopTeamScroll();
+                      const el = teamCarouselRef.current;
+                      if (el) el.scrollTo({ left: i * 263, behavior: "smooth" });
+                      if (!teamScrollPaused) setTimeout(startTeamScroll, 3000);
+                    }}
+                    className="w-2 h-2 rounded-full bg-slate-300 transition-colors"
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = BRAND_BLUE)}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = "")}
+                    aria-label={`Go to team member ${i + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  stopTeamScroll();
+                  const el = teamCarouselRef.current;
+                  if (el) el.scrollBy({ left: 263, behavior: "smooth" });
+                  if (!teamScrollPaused) setTimeout(startTeamScroll, 3000);
+                }}
+                aria-label="Scroll team right"
+                className="w-12 h-12 flex items-center justify-center border-2 border-slate-300 text-slate-700 text-2xl font-bold transition-all bg-white"
+                onMouseEnter={e => { e.currentTarget.style.borderColor = BRAND_BLUE; e.currentTarget.style.color = BRAND_BLUE; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.color = ""; }}
+              >›</button>
             </div>
           </div>
         </RevealSection>
 
       </main>
 
-      {/* ─── FOOTER ─── */}
+      {/* FOOTER */}
       <footer className="bg-slate-950 text-white py-24 px-6 lg:px-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
           <div className="space-y-6">
@@ -659,9 +701,10 @@ useEffect(() => {
             </p>
           </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-blue-500 mb-8">Explore</h3>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] mb-8" style={{ color: BRAND_BLUE }}>Explore</h3>
             <ul className="space-y-4 text-sm font-medium uppercase tracking-widest text-slate-300">
               <li><a href="/playground/" onClick={(e) => { e.preventDefault(); window.location.href = "/playground/"; }} className="hover:text-white transition">Playground</a></li>
+              <li><a href="/gallery" className="hover:text-white transition">Event Gallery</a></li>
               <li><a href="/evidence" className="hover:text-white transition">User Evidence</a></li>
               <li><a href="#who-we-are" className="hover:text-white transition">Who we are</a></li>
               <li><a href="#our-team" className="hover:text-white transition">Our team</a></li>
@@ -669,7 +712,7 @@ useEffect(() => {
             </ul>
           </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-blue-500 mb-8">Contact</h3>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] mb-8" style={{ color: BRAND_BLUE }}>Contact</h3>
             <ul className="space-y-4 text-sm text-slate-300">
               <li><a href={MAIL_CONTACT} target="_blank" rel="noopener noreferrer" className="hover:text-white transition">braillededucation@gmail.com</a></li>
               <li><a href="tel:+254712015793" className="hover:text-white transition">0712 015793</a></li>
@@ -678,7 +721,7 @@ useEffect(() => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto border-t border-white/10 mt-20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-xs uppercase tracking-widest">© {year} BrailleEducation </p>
+          <p className="text-slate-500 text-xs uppercase tracking-widest">© {year} BrailleEducation</p>
           <div className="flex gap-8 text-slate-500 text-xs uppercase tracking-widest">
             <span>Accessibility First</span>
             <span>Terms</span>
@@ -689,12 +732,14 @@ useEffect(() => {
 
       <AccessibilityPanel />
 
-      {/* ─── LIGHTBOX ─── */}
+      {/* LIGHTBOX */}
       {kitLightbox !== null ? (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/95 p-6" role="dialog" aria-modal="true">
           <button
             ref={kitLightboxCloseRef}
-            className="absolute top-8 right-8 text-white text-4xl hover:text-blue-500 transition"
+            className="absolute top-8 right-8 text-white text-4xl transition"
+            onMouseEnter={e => (e.currentTarget.style.color = BRAND_BLUE)}
+            onMouseLeave={e => (e.currentTarget.style.color = "")}
             onClick={closeKitLightbox}
             aria-label="Close"
           >×</button>

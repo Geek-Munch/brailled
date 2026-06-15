@@ -9,10 +9,11 @@ import { LearnerEvidence } from '../types/evidence';
 
 const LOGO = "/Braille%20bot%20%20Bio.png";
 
-const ELECTRIC_BLUE = "#1E90FF";     
-const ELECTRIC_BLUE_DARK = "#007BFF"; 
-const ELECTRIC_BLUE_LIGHT = "#4DA6FF"; 
-const ELECTRIC_BLUE_GLOW = "rgba(30, 144, 255, 0.15)"; 
+// Updated brand color #0088ce
+const BRAND_BLUE = "#0088ce";
+const BRAND_BLUE_DARK = "#0088ce";
+const BRAND_BLUE_LIGHT = "#0088ce";
+const BRAND_BLUE_GLOW = "rgba(0, 136, 206, 0.15)";
 
 // Counting Animation Logic 
 function CountingNumber({ value }: { value: number }) {
@@ -165,7 +166,7 @@ export function EvidencePage() {
             <img
               src={LOGO}
               alt="BrailleEd Logo"
-              className={`h-16 sm:h-20 md:h-28 w-auto object-contain transition-all cursor-pointer ${scrolled ? '' : 'brightness-0 invert'}`}
+              className={`h-28 sm:h-32 md:h-40 lg:h-44 w-auto object-contain transition-all cursor-pointer ${scrolled ? '' : 'brightness-0 invert'}`}
             />
           </a>
           
@@ -180,7 +181,7 @@ export function EvidencePage() {
             <a href="/#purchase-kit" className={`text-xs font-bold uppercase tracking-widest transition ${scrolled ? 'text-slate-600 hover:text-blue-600' : 'text-white hover:text-blue-300'}`}>
               Purchase a kit
             </a>
-            <a href="/evidence" className={`text-xs font-bold uppercase tracking-widest transition ${scrolled ? 'border-b-2' : 'border-b-2'}`} style={{ color: ELECTRIC_BLUE, borderBottomColor: ELECTRIC_BLUE }}>
+            <a href="/evidence" className={`text-xs font-bold uppercase tracking-widest transition ${scrolled ? 'border-b-2' : 'border-b-2'}`} style={{ color: BRAND_BLUE, borderBottomColor: BRAND_BLUE }}>
               User Evidence
             </a>
             
@@ -188,10 +189,11 @@ export function EvidencePage() {
               <a href={MAIL_DEMO} target='_blank' className={`text-xs font-bold uppercase tracking-widest px-4 xl:px-6 py-2 xl:py-2.5 border-2 transition
                 ${scrolled
                   ? 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
-                  : 'border-white text-white hover:bg-white hover:text-slate-900'}`}>
+                  : 'border-white text-white hover:bg-white hover:text-slate-900'}`}
+                style={scrolled ? { borderColor: BRAND_BLUE, color: BRAND_BLUE } : {}}>
                 Book a demo
               </a>
-              <a href="/playground/" className="text-xs font-bold uppercase tracking-widest text-white px-4 xl:px-6 py-2 xl:py-2.5 transition" style={{ backgroundColor: ELECTRIC_BLUE }}>
+              <a href="/playground/" className="text-xs font-bold uppercase tracking-widest text-white px-4 xl:px-6 py-2 xl:py-2.5 transition" style={{ backgroundColor: BRAND_BLUE }}>
                 Open playground
               </a>
             </div>
@@ -225,7 +227,7 @@ export function EvidencePage() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden pt-36 pb-20 md:pt-44 md:pb-28 min-h-[60vh]" style={{ backgroundColor: '#0f172a' }}>
+      <section className="relative overflow-hidden pt-44 pb-20 md:pt-52 md:pb-28 min-h-[60vh]" style={{ backgroundColor: '#0f172a' }}>
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
@@ -266,8 +268,8 @@ export function EvidencePage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-24">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-            <div className="border-l-8 pl-8" style={{ borderColor: ELECTRIC_BLUE }}>
-              <p className="font-bold uppercase tracking-[0.3em] text-sm mb-4" style={{ color: ELECTRIC_BLUE_LIGHT }}>
+            <div className="border-l-8 pl-8" style={{ borderColor: BRAND_BLUE }}>
+              <p className="font-bold uppercase tracking-[0.3em] text-sm mb-4" style={{ color: BRAND_BLUE_LIGHT }}>
                 Real Impact Data
               </p>
               <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mb-4">
@@ -316,11 +318,11 @@ export function EvidencePage() {
           <div className="impact-grid mb-10">
             <div className="impact-card" style={{ backgroundColor: 'var(--white)' }}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: ELECTRIC_BLUE_GLOW }}>
-                  <TrendingUp className="w-5 h-5" style={{ color: ELECTRIC_BLUE }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: BRAND_BLUE_GLOW }}>
+                  <TrendingUp className="w-5 h-5" style={{ color: BRAND_BLUE }} />
                 </div>
               </div>
-              <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
+              <div className="impact-number text-3xl font-black" style={{ color: BRAND_BLUE }}>
                 <CountingNumber value={stats.recordCount} />
               </div>
               <div className="impact-label text-sm">learners engaged</div>
@@ -328,11 +330,11 @@ export function EvidencePage() {
 
             <div className="impact-card" style={{ backgroundColor: 'var(--white)' }}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: ELECTRIC_BLUE_GLOW }}>
-                  <MapPin className="w-5 h-5" style={{ color: ELECTRIC_BLUE }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: BRAND_BLUE_GLOW }}>
+                  <MapPin className="w-5 h-5" style={{ color: BRAND_BLUE }} />
                 </div>
               </div>
-              <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
+              <div className="impact-number text-3xl font-black" style={{ color: BRAND_BLUE }}>
                 <CountingNumber value={stats.countyCount} />
               </div>
               <div className="impact-label text-sm">counties across Kenya</div>
@@ -340,11 +342,11 @@ export function EvidencePage() {
 
             <div className="impact-card" style={{ backgroundColor: 'var(--white)' }}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: ELECTRIC_BLUE_GLOW }}>
-                  <Users className="w-5 h-5" style={{ color: ELECTRIC_BLUE }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: BRAND_BLUE_GLOW }}>
+                  <Users className="w-5 h-5" style={{ color: BRAND_BLUE }} />
                 </div>
               </div>
-              <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
+              <div className="impact-number text-3xl font-black" style={{ color: BRAND_BLUE }}>
                 <CountingNumber value={averageAge} />
               </div>
               <div className="impact-label text-sm">average learner age</div>
@@ -352,11 +354,11 @@ export function EvidencePage() {
 
             <div className="impact-card" style={{ backgroundColor: 'var(--white)' }}>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: ELECTRIC_BLUE_GLOW }}>
-                  <Award className="w-5 h-5" style={{ color: ELECTRIC_BLUE }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: BRAND_BLUE_GLOW }}>
+                  <Award className="w-5 h-5" style={{ color: BRAND_BLUE }} />
                 </div>
               </div>
-              <div className="impact-number text-3xl font-black" style={{ color: ELECTRIC_BLUE }}>
+              <div className="impact-number text-3xl font-black" style={{ color: BRAND_BLUE }}>
                 <CountingNumber value={stats.sessionTypes.length} />
               </div>
               <div className="impact-label text-sm">different session types</div>
@@ -364,19 +366,19 @@ export function EvidencePage() {
           </div>
 
           <div className="access-list mb-8">
-            <li style={{ backgroundColor: 'var(--brand-soft)', borderColor: 'var(--brand-border)', borderLeftColor: ELECTRIC_BLUE }}>
+            <li style={{ backgroundColor: 'var(--brand-soft)', borderColor: 'var(--brand-border)', borderLeftColor: BRAND_BLUE }}>
               <div className="flex flex-wrap justify-between items-center gap-4">
                 <div className="flex flex-wrap gap-6">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ELECTRIC_BLUE }}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: BRAND_BLUE }}></div>
                     <span className="text-sm font-medium" style={{ color: 'var(--brand-deep)' }}>Blind (congenital)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ELECTRIC_BLUE_LIGHT }}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: BRAND_BLUE_LIGHT }}></div>
                     <span className="text-sm font-medium" style={{ color: 'var(--brand-deep)' }}>Low Vision</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ELECTRIC_BLUE_DARK }}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: BRAND_BLUE_DARK }}></div>
                     <span className="text-sm font-medium" style={{ color: 'var(--brand-deep)' }}>Blind (acquired)</span>
                   </div>
                 </div>

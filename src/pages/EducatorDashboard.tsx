@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { apiRequest, fetchAllPages } from "../lib/api-client";
 import { useAuth } from "../contexts/AuthContext";
 
+const BRAND_BLUE = "#0088ce";
+const BRAND_BLUE_DARK = "#006699";
+const BRAND_BLUE_LIGHT = "#3399cc";
+const BRAND_BLUE_GLOW = "rgba(0, 136, 206, 0.12)";
+
 type EducatorProfile = {
   id: number;
   username: string;
@@ -119,7 +124,7 @@ export function EducatorDashboard() {
           <input value={username} onChange={(e) => setUsername(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Username" required />
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Password" required />
           {loginError && <p className="text-sm text-red-600">{loginError}</p>}
-          <button type="submit" className="w-full bg-blue-600 text-white rounded-lg py-2 font-semibold">Sign In</button>
+          <button type="submit" className="w-full text-white rounded-lg py-2 font-semibold" style={{ backgroundColor: BRAND_BLUE }}>Sign In</button>
         </form>
       </div>
     );
@@ -131,7 +136,7 @@ export function EducatorDashboard() {
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-xl p-6 text-center">
           <h2 className="text-xl font-bold text-gray-900">Educator Access Required</h2>
           <p className="text-sm text-gray-500 mt-2">This account cannot access the educator dashboard.</p>
-          <button onClick={logout} className="mt-4 bg-blue-600 text-white rounded-lg py-2 px-4 font-semibold">Sign Out</button>
+          <button onClick={logout} className="mt-4 text-white rounded-lg py-2 px-4 font-semibold" style={{ backgroundColor: BRAND_BLUE }}>Sign Out</button>
         </div>
       </div>
     );
@@ -139,7 +144,7 @@ export function EducatorDashboard() {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#dbeafe_0%,_#eff6ff_32%,_#f8fafc_66%)]">
-      <header className="bg-gradient-to-r from-slate-900 via-blue-900 to-cyan-800 text-white shadow-lg">
+      <header style={{ background: `linear-gradient(90deg, ${BRAND_BLUE_DARK} 0%, ${BRAND_BLUE} 55%, ${BRAND_BLUE_LIGHT} 100%)` }} className="text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-7 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-cyan-200 font-semibold">BrailleEd Platform</p>
@@ -148,7 +153,7 @@ export function EducatorDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={loadAll} className="bg-white/15 hover:bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm font-semibold">Refresh</button>
-            <button onClick={logout} className="bg-white text-blue-700 hover:bg-blue-50 rounded-lg px-4 py-2 text-sm font-semibold">Sign Out</button>
+            <button onClick={logout} className="bg-white rounded-lg px-4 py-2 text-sm font-semibold" style={{ color: BRAND_BLUE }}>Sign Out</button>
           </div>
         </div>
       </header>
@@ -159,7 +164,8 @@ export function EducatorDashboard() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition ${tab === t ? "bg-gradient-to-r from-blue-700 to-cyan-600 text-white shadow" : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100"}`}
+              className={`px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition ${tab === t ? "text-white shadow" : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100"}`}
+              style={tab === t ? { backgroundColor: BRAND_BLUE } : undefined}
             >
               {t}
             </button>
@@ -177,7 +183,7 @@ export function EducatorDashboard() {
                 <p className="text-xs uppercase tracking-wider text-slate-500">{k.replace("_", " ")}</p>
                 <p className="text-2xl font-black text-slate-900 mt-1">{v}</p>
                 <div className="mt-3 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                  <div className="h-full w-2/3 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full" />
+                  <div className="h-full w-2/3 rounded-full" style={{ backgroundColor: BRAND_BLUE }} />
                 </div>
               </div>
             ))}
@@ -310,7 +316,7 @@ function ProfilePanel({
           </label>
         ))}
       </div>
-      <button onClick={save} className="bg-gradient-to-r from-blue-700 to-cyan-600 hover:from-blue-800 hover:to-cyan-700 text-white rounded-lg px-4 py-2 text-sm font-semibold shadow">Save Profile</button>
+      <button onClick={save} className="text-white rounded-lg px-4 py-2 text-sm font-semibold shadow" style={{ backgroundColor: BRAND_BLUE }}>Save Profile</button>
     </div>
   );
 }
@@ -507,14 +513,14 @@ function CurriculumBuilder({
         <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">1. Courses</h3>
         <div className="space-y-2 max-h-80 overflow-auto">
           {courses.map((course) => (
-            <div key={course.id} className={`rounded-lg px-3 py-2 border text-sm ${selectedCourseId === course.id ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-700"}`}>
+            <div key={course.id} className={`rounded-lg px-3 py-2 border text-sm ${selectedCourseId === course.id ? "text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-700"}`} style={selectedCourseId === course.id ? { backgroundColor: BRAND_BLUE, borderColor: BRAND_BLUE } : {}}>
               {editingCourseId === course.id ? (
                 <div className="space-y-2">
                   <input value={courseEditForm.title} onChange={(e) => setCourseEditForm((p) => ({ ...p, title: e.target.value }))} className="w-full text-slate-900 border border-slate-300 rounded px-2 py-1" />
                   <textarea value={courseEditForm.description} onChange={(e) => setCourseEditForm((p) => ({ ...p, description: e.target.value }))} className="w-full text-slate-900 border border-slate-300 rounded px-2 py-1" rows={2} />
                   <label className="flex items-center gap-2 text-xs text-white"><input type="checkbox" checked={courseEditForm.is_published} onChange={(e) => setCourseEditForm((p) => ({ ...p, is_published: e.target.checked }))} /> Published</label>
                   <div className="flex gap-2">
-                    <button onClick={saveCourseEdit} className="text-xs bg-white text-blue-700 rounded px-2 py-1 font-semibold">Save</button>
+                    <button onClick={saveCourseEdit} className="text-xs bg-white rounded px-2 py-1 font-semibold" style={{ color: BRAND_BLUE }}>Save</button>
                     <button onClick={() => setEditingCourseId(null)} className="text-xs bg-white/20 text-white rounded px-2 py-1 font-semibold">Cancel</button>
                   </div>
                 </div>
@@ -525,7 +531,7 @@ function CurriculumBuilder({
                     <div className={`text-xs ${selectedCourseId === course.id ? "text-blue-100" : "text-slate-500"}`}>{course.is_published ? "Published" : "Draft"}</div>
                   </button>
                   <div className="mt-2 flex gap-2">
-                    <button onClick={() => startEditCourse(course)} className={`text-xs font-semibold ${selectedCourseId === course.id ? "text-white" : "text-blue-700"}`}>Edit</button>
+                    <button onClick={() => startEditCourse(course)} className={`text-xs font-semibold ${selectedCourseId === course.id ? "text-white" : "text-blue-700"}`} style={selectedCourseId === course.id ? {} : { color: BRAND_BLUE }}>Edit</button>
                     <button onClick={() => deleteCourse(course.id)} className={`text-xs font-semibold ${selectedCourseId === course.id ? "text-red-100" : "text-red-700"}`}>Delete</button>
                   </div>
                 </>
@@ -537,7 +543,7 @@ function CurriculumBuilder({
           <input value={courseForm.title} onChange={(e) => setCourseForm((p) => ({ ...p, title: e.target.value }))} placeholder="Course title" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
           <textarea value={courseForm.description} onChange={(e) => setCourseForm((p) => ({ ...p, description: e.target.value }))} placeholder="Course description" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" rows={2} />
           <label className="flex items-center gap-2 text-xs text-slate-700"><input type="checkbox" checked={courseForm.is_published} onChange={(e) => setCourseForm((p) => ({ ...p, is_published: e.target.checked }))} /> Published</label>
-          <button onClick={createCourse} className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 text-sm font-semibold">Add Course</button>
+          <button onClick={createCourse} className="w-full text-white rounded-lg px-3 py-2 text-sm font-semibold" style={{ backgroundColor: BRAND_BLUE }}>Add Course</button>
         </div>
       </div>
 
@@ -546,14 +552,14 @@ function CurriculumBuilder({
         {!selectedCourseId && <p className="text-sm text-slate-500">Select a course first.</p>}
         <div className="space-y-2 max-h-80 overflow-auto">
           {courseModules.map((module) => (
-            <div key={module.id} className={`rounded-lg px-3 py-2 border text-sm ${selectedModuleId === module.id ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-700"}`}>
+            <div key={module.id} className={`rounded-lg px-3 py-2 border text-sm ${selectedModuleId === module.id ? "text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-700"}`} style={selectedModuleId === module.id ? { backgroundColor: BRAND_BLUE, borderColor: BRAND_BLUE } : {}}>
               {editingModuleId === module.id ? (
                 <div className="space-y-2">
                   <input value={moduleEditForm.title} onChange={(e) => setModuleEditForm((p) => ({ ...p, title: e.target.value }))} className="w-full text-slate-900 border border-slate-300 rounded px-2 py-1" />
                   <textarea value={moduleEditForm.description} onChange={(e) => setModuleEditForm((p) => ({ ...p, description: e.target.value }))} className="w-full text-slate-900 border border-slate-300 rounded px-2 py-1" rows={2} />
                   <input type="number" value={moduleEditForm.order} onChange={(e) => setModuleEditForm((p) => ({ ...p, order: Number(e.target.value) }))} className="w-full text-slate-900 border border-slate-300 rounded px-2 py-1" />
                   <div className="flex gap-2">
-                    <button onClick={saveModuleEdit} className="text-xs bg-white text-blue-700 rounded px-2 py-1 font-semibold">Save</button>
+                    <button onClick={saveModuleEdit} className="text-xs bg-white rounded px-2 py-1 font-semibold" style={{ color: BRAND_BLUE }}>Save</button>
                     <button onClick={() => setEditingModuleId(null)} className="text-xs bg-white/20 text-white rounded px-2 py-1 font-semibold">Cancel</button>
                   </div>
                 </div>
@@ -564,7 +570,7 @@ function CurriculumBuilder({
                     <div className={`text-xs ${selectedModuleId === module.id ? "text-blue-100" : "text-slate-500"}`}>Order {module.order}</div>
                   </button>
                   <div className="mt-2 flex gap-2">
-                    <button onClick={() => startEditModule(module)} className={`text-xs font-semibold ${selectedModuleId === module.id ? "text-white" : "text-blue-700"}`}>Edit</button>
+                    <button onClick={() => startEditModule(module)} className={`text-xs font-semibold ${selectedModuleId === module.id ? "text-white" : "text-blue-700"}`} style={selectedModuleId === module.id ? {} : { color: BRAND_BLUE }}>Edit</button>
                     <button onClick={() => deleteModule(module.id)} className={`text-xs font-semibold ${selectedModuleId === module.id ? "text-red-100" : "text-red-700"}`}>Delete</button>
                   </div>
                 </>
@@ -576,7 +582,7 @@ function CurriculumBuilder({
           <input value={moduleForm.title} onChange={(e) => setModuleForm((p) => ({ ...p, title: e.target.value }))} placeholder="Module title" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
           <textarea value={moduleForm.description} onChange={(e) => setModuleForm((p) => ({ ...p, description: e.target.value }))} placeholder="Module description" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" rows={2} />
           <input type="number" value={moduleForm.order} onChange={(e) => setModuleForm((p) => ({ ...p, order: Number(e.target.value) }))} placeholder="Order" className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
-          <button onClick={createModule} disabled={!selectedCourseId} className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-2 text-sm font-semibold">Add Module</button>
+          <button onClick={createModule} disabled={!selectedCourseId} className="w-full text-white rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-50" style={{ backgroundColor: BRAND_BLUE }}>Add Module</button>
         </div>
       </div>
 
@@ -592,7 +598,7 @@ function CurriculumBuilder({
                   <textarea value={lessonEditForm.content} onChange={(e) => setLessonEditForm((p) => ({ ...p, content: e.target.value }))} className="w-full border border-slate-300 rounded px-2 py-1" rows={2} />
                   <input type="number" value={lessonEditForm.order} onChange={(e) => setLessonEditForm((p) => ({ ...p, order: Number(e.target.value) }))} className="w-full border border-slate-300 rounded px-2 py-1" />
                   <div className="flex gap-2">
-                    <button onClick={saveLessonEdit} className="text-xs bg-blue-600 text-white rounded px-2 py-1 font-semibold">Save</button>
+                    <button onClick={saveLessonEdit} className="text-xs text-white rounded px-2 py-1 font-semibold" style={{ backgroundColor: BRAND_BLUE }}>Save</button>
                     <button onClick={() => setEditingLessonId(null)} className="text-xs bg-slate-200 text-slate-700 rounded px-2 py-1 font-semibold">Cancel</button>
                   </div>
                 </div>
@@ -601,12 +607,10 @@ function CurriculumBuilder({
                   <div className="font-semibold">{lesson.title}</div>
                   <div className="text-xs text-slate-500">Order {lesson.order}</div>
                   {lesson.content_pdf_url && (
-                    <a href={lesson.content_pdf_url} target="_blank" rel="noreferrer" className="text-xs text-blue-700 underline">
-                      View PDF
-                    </a>
+                    <a href={lesson.content_pdf_url} target="_blank" rel="noreferrer" className="text-xs underline" style={{ color: BRAND_BLUE }}>View PDF</a>
                   )}
                   <div className="mt-2 flex gap-2">
-                    <button onClick={() => startEditLesson(lesson)} className="text-xs text-blue-700 font-semibold">Edit</button>
+                    <button onClick={() => startEditLesson(lesson)} className="text-xs font-semibold" style={{ color: BRAND_BLUE }}>Edit</button>
                     <button onClick={() => deleteLesson(lesson.id)} className="text-xs text-red-700 font-semibold">Delete</button>
                   </div>
                 </>
@@ -624,7 +628,7 @@ function CurriculumBuilder({
             onChange={(e) => setLessonPdf(e.target.files?.[0] ?? null)}
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white"
           />
-          <button onClick={createLesson} disabled={!selectedModuleId} className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-2 text-sm font-semibold">Add Lesson</button>
+          <button onClick={createLesson} disabled={!selectedModuleId} className="w-full text-white rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-50" style={{ backgroundColor: BRAND_BLUE }}>Add Lesson</button>
         </div>
       </div>
     </div>
@@ -729,7 +733,7 @@ function CrudPanel({
                 className="border border-slate-300 rounded-lg px-3 py-2 text-sm"
               />
             ))}
-            <button onClick={create} className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold">Create</button>
+            <button onClick={create} className="md:col-span-2 text-white rounded-lg px-4 py-2 text-sm font-semibold" style={{ backgroundColor: BRAND_BLUE }}>Create</button>
           </div>
         )}
       </div>
@@ -738,8 +742,8 @@ function CrudPanel({
         <table className="w-full text-sm">
           <thead className="bg-slate-50">
             <tr>
-              {columns.map((c) => <th key={c} className="px-3 py-3 text-left uppercase tracking-wider text-xs text-blue-700">{c}</th>)}
-              <th className="px-3 py-3 text-left uppercase tracking-wider text-xs text-blue-700">actions</th>
+              {columns.map((c) => <th key={c} className="px-3 py-3 text-left uppercase tracking-wider text-xs" style={{ color: BRAND_BLUE }}>{c}</th>)}
+              <th className="px-3 py-3 text-left uppercase tracking-wider text-xs" style={{ color: BRAND_BLUE }}>actions</th>
             </tr>
           </thead>
           <tbody>
@@ -760,7 +764,7 @@ function CrudPanel({
                 ))}
                 <td className="px-3 py-2 whitespace-nowrap">
                   {editingId === item.id ? (
-                    <button onClick={saveEdit} className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md text-xs font-semibold mr-2">Save</button>
+                    <button onClick={saveEdit} className="inline-flex items-center text-white px-2.5 py-1 rounded-md text-xs font-semibold mr-2" style={{ backgroundColor: BRAND_BLUE }}>Save</button>
                   ) : (
                     <button onClick={() => startEdit(item)} className="inline-flex items-center bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-md text-xs font-semibold mr-2">Edit</button>
                   )}
