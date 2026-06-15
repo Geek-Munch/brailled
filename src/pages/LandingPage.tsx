@@ -237,7 +237,7 @@ useEffect(() => {
         Skip to main content
       </a>
 
-      {/* ─── HEADER ─── */}
+      {/* HEADER */}
       <header
         className={`fixed top-0 w-full z-[100] px-4 sm:px-6 lg:px-16 py-3 sm:py-4 transition-all duration-500
           ${showHeader ? "translate-y-0" : "-translate-y-full"}
@@ -312,7 +312,7 @@ useEffect(() => {
 
       <main id="main-content">
 
-        {/* ─── HERO ─── */}
+        {/* HERO */}
         <section className="relative min-h-screen flex items-start justify-center bg-slate-900 pt-36 pb-16">
           <video
             ref={videoRef}
@@ -371,7 +371,7 @@ useEffect(() => {
           </div>
         </section>
 
-        {/* ─── WHO WE ARE ─── */}
+        {/* WHO WE ARE */}
         <RevealSection className="py-24 bg-slate-50 px-6 lg:px-24" id="who-we-are">
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
             <div className="lg:w-[55%] border-l-8 border-blue-600 pl-8">
@@ -394,7 +394,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── OUR TEAM ─── */}
+        {/*  OUR TEAM  */}
         <RevealSection className="py-24 bg-white px-6 lg:px-24" id="our-team">
           <div className="max-w-7xl mx-auto">
 
@@ -487,7 +487,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── IMPACT ─── */}
+        {/* IMPACT */}
         <RevealSection className="py-24 relative" id="impact">
           {/* TO CHANGE THIS IMAGE: replace "impact.jpeg" with your own image path */}
           <div className="absolute inset-0 overflow-hidden">
@@ -538,7 +538,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── ACCESSIBILITY FEATURES ─── */}
+        {/*  ACCESSIBILITY FEATURES  */}
         <RevealSection className="py-24 bg-white px-6 lg:px-24">
           <div className="max-w-7xl mx-auto">
             <div className="border-l-8 border-blue-600 pl-8 mb-16">
@@ -561,7 +561,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── WHAT YOU CAN DO ─── */}
+        {/*  WHAT YOU CAN DO */}
         <RevealSection className="py-24 bg-slate-900 text-white px-6 lg:px-24">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-20">
@@ -584,7 +584,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── VIDEO ─── */}
+        {/*  VIDEO  */}
         <RevealSection className="py-24 bg-white px-6 lg:px-24 text-center">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 mb-8">See BrailleEd in Action</h2>
@@ -606,7 +606,7 @@ useEffect(() => {
           </div>
         </RevealSection>
 
-        {/* ─── PURCHASE KIT ─── */}
+        {/*  PURCHASE KIT  */}
         <RevealSection className="py-24 bg-slate-50 px-6 lg:px-24" id="purchase-kit">
           <div className="max-w-7xl mx-auto">
             <div className="border-l-8 border-blue-600 pl-8 mb-16">
@@ -649,7 +649,7 @@ useEffect(() => {
 
       </main>
 
-      {/* ─── FOOTER ─── */}
+      {/*  FOOTER  */}
       <footer className="bg-slate-950 text-white py-24 px-6 lg:px-24">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
           <div className="space-y-6">
@@ -689,7 +689,7 @@ useEffect(() => {
 
       <AccessibilityPanel />
 
-      {/* ─── LIGHTBOX ─── */}
+      {/* LIGHTBOX  */}
       {kitLightbox !== null ? (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/95 p-6" role="dialog" aria-modal="true">
           <button
